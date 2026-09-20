@@ -5,22 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chronical - Assistente Virtual</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Biblioteca para formatar texto Markdown (títulos, listas, negrito) -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- SDKs do Firebase Auth (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <div class="chat-container" role="main">
+
+    <!-- TELA DE LOGIN E CADASTRO -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-box">
+            <h2>Bem-vindo à Chronical</h2>
+            <p>Acesse com sua conta para continuar</p>
+
+            <button id="google-login-btn" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Entrar com o Google
+            </button>
+
+            <div class="divider">ou</div>
+
+            <input type="email" id="auth-email" placeholder="Seu e-mail" autocomplete="email" />
+            <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
+
+            <div class="auth-buttons">
+                <button id="login-btn">Entrar</button>
+                <button id="register-btn" class="secondary-btn">Cadastrar</button>
+            </div>
+            
+            <p id="auth-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <!-- TELA DO CHAT (Exibida somente após o login) -->
+    <div id="chat-container" class="chat-container hidden" role="main">
         <header>
             <h1>Chronical</h1>
+            <div class="user-profile">
+                <span id="user-display-name"></span>
+                <button id="logout-btn" aria-label="Sair da conta">Sair</button>
+            </div>
         </header>
 
-        <!-- aria-live="polite" faz os leitores de ecrã lerem as novas respostas automaticamente -->
-        <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens do chat">
+        <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
             <div class="message assistant-message">
                 <strong>Chronical:</strong> Olá! Sou a Chronical. Como posso ajudar você hoje?
             </div>
         </main>
 
-        <footer class="input-container" role="region" aria-label="Envio de mensagem">
+        <footer class="input-container" role="region" aria-label="Área de envio de mensagem">
             <label for="user-input" class="sr-only">Digite sua mensagem para a Chronical</label>
             <input 
                 type="text" 
