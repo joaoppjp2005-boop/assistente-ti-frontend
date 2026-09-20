@@ -1,5 +1,5 @@
-// ATENÇÃO: Substitua o URL abaixo pelo link real do seu backend no Render
-const BACKEND_URL = "https://assistente-ti-frontend.vercel.app/";
+// URL do teu backend no Render
+const BACKEND_URL = "https://assistente-ti-backend.onrender.com/chat";
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
@@ -19,14 +19,14 @@ async function sendMessage() {
     const messageText = userInput.value.trim();
     if (!messageText) return;
 
-    // Adiciona a mensagem do utilizador no chat
+    // Mostra a tua mensagem no ecrã
     appendMessage("Você", messageText, "user");
     userInput.value = "";
 
-    // Adiciona o indicador de carregamento
+    // Criar o indicador de "A pensar..."
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("message", "assistant-message");
-    loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
+    loadingDiv.innerHTML = "<strong>Chronical:</strong> A pensar...";
     chatBox.appendChild(loadingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -52,12 +52,14 @@ async function sendMessage() {
             chatBox.removeChild(loadingDiv);
         }
         appendMessage("Chronical", "Erro ao ligar ao servidor. Tente novamente em instantes.", "ia");
-        console.error(error);
+        console.error("Erro na comunicação com o backend:", error);
     }
 }
 
+// Evento ao clicar no botão Enviar
 sendBtn.addEventListener("click", sendMessage);
 
+// Evento ao pressionar Enter no teclado
 userInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
         sendMessage();
