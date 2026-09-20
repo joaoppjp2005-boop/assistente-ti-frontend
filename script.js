@@ -1,5 +1,5 @@
 // ATENÇÃO: Substitua o URL abaixo pelo link real do seu backend no Render
-const BACKEND_URL = "https://assistente-ti-backend.onrender.com/chat";
+const BACKEND_URL = "https://assistente-ti-frontend.vercel.app/";
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
