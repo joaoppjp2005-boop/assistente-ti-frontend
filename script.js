@@ -29,7 +29,7 @@ async function sendMessage() {
 
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("message", "assistant-message");
-    loadingDiv.innerHTML = "<strong>Chronical:</strong> Pensando...";
+    loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
     chatBox.appendChild(loadingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -43,7 +43,9 @@ async function sendMessage() {
         });
 
         const data = await response.json();
-        chatBox.removeChild(loadingDiv);
+        if (chatBox.contains(loadingDiv)) {
+            chatBox.removeChild(loadingDiv);
+        }
 
         if (data && data.response) {
             appendMessage("Chronical", data.response, "ia");
@@ -58,10 +60,14 @@ async function sendMessage() {
     }
 }
 
-sendBtn.addEventListener("click", sendMessage);
+if (sendBtn) {
+    sendBtn.addEventListener("click", sendMessage);
+}
 
-userInput.addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-        sendMessage();
-    }
-});
+if (userInput) {
+    userInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    });
+}
