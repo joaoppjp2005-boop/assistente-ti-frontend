@@ -1,5 +1,5 @@
 // URL do teu backend no Render
-const BACKEND_URL = "https://assistente-ti-backend.onrender.com/chat";
+const BACKEND_URL = "https://assistente-ti-backendd.onrender.com/chat";
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
