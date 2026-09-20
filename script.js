@@ -1,16 +1,32 @@
-// URL do teu backend no Render
 const BACKEND_URL = "https://assistente-ti-backendd.onrender.com/chat";
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
+// Função para formatar o texto do Gemini (Markdown simples para HTML)
+function formatMarkdown(text) {
+    return text
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^\* (.*$)/gim, '<li>$1</li>')
+        .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+        .replace(/\n/g, '<br>');
+}
+
 function appendMessage(sender, text, type) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("message");
     msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
     
-    msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    if (type === "ia") {
+        msgDiv.innerHTML = `<strong>${sender}:</strong><div class="ia-text">${formatMarkdown(text)}</div>`;
+    } else {
+        msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+    }
+
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 }
@@ -19,11 +35,9 @@ async function sendMessage() {
     const messageText = userInput.value.trim();
     if (!messageText) return;
 
-    // Mostra a tua mensagem no ecrã
     appendMessage("Você", messageText, "user");
     userInput.value = "";
 
-    // Criar o indicador de "A pensar..."
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("message", "assistant-message");
     loadingDiv.innerHTML = "<strong>Chronical:</strong> A pensar...";
@@ -52,14 +66,11 @@ async function sendMessage() {
             chatBox.removeChild(loadingDiv);
         }
         appendMessage("Chronical", "Erro ao ligar ao servidor. Tente novamente em instantes.", "ia");
-        console.error("Erro na comunicação com o backend:", error);
     }
 }
 
-// Evento ao clicar no botão Enviar
 sendBtn.addEventListener("click", sendMessage);
 
-// Evento ao pressionar Enter no teclado
 userInput.addEventListener("keypress", function (e) {
     if (e.key === "Enter") {
         sendMessage();
