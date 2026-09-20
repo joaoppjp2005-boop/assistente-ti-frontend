@@ -21,7 +21,7 @@
             <h2>Bem-vindo à Chronical</h2>
             <p>Acesse com sua conta ou continue como visitante</p>
 
-            <button id="google-login-btn" class="google-btn">
+            <button id="google-login-btn" class="google-btn" type="button">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
                 Entrar com o Google
             </button>
@@ -32,12 +32,12 @@
             <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
 
             <div class="auth-buttons">
-                <button id="login-btn">Entrar</button>
-                <button id="register-btn" class="secondary-btn">Cadastrar</button>
+                <button id="login-btn" type="button">Entrar</button>
+                <button id="register-btn" class="secondary-btn" type="button">Cadastrar</button>
             </div>
 
-            <!-- Botão para usar sem login -->
-            <button id="guest-btn" class="guest-btn">Continuar como Visitante</button>
+            <!-- Botão com clique direto integrado -->
+            <button id="guest-btn" class="guest-btn" type="button" onclick="entrarComoVisitante()">Continuar como Visitante</button>
             
             <p id="auth-error" class="error-msg"></p>
         </div>
@@ -49,7 +49,7 @@
             <h1>Chronical</h1>
             <div class="user-profile">
                 <span id="user-display-name"></span>
-                <button id="logout-btn" aria-label="Sair da conta">Sair</button>
+                <button id="logout-btn" aria-label="Sair da conta" type="button">Sair</button>
             </div>
         </header>
 
@@ -68,7 +68,7 @@
                 aria-label="Mensagem para o assistente"
                 autocomplete="off"
             />
-            <button id="send-btn" aria-label="Enviar mensagem">Enviar</button>
+            <button id="send-btn" aria-label="Enviar mensagem" type="button">Enviar</button>
         </footer>
     </div>
 
