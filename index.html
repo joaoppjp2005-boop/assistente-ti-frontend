@@ -6,7 +6,7 @@
     <title>Chronical - Assistente Virtual</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Biblioteca para formatar texto Markdown (títulos, listas, negrito) -->
+    <!-- Biblioteca para formatar texto Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     
     <!-- SDKs do Firebase Auth (Compat) -->
@@ -19,7 +19,7 @@
     <div id="auth-container" class="auth-container">
         <div class="auth-box">
             <h2>Bem-vindo à Chronical</h2>
-            <p>Acesse com sua conta para continuar</p>
+            <p>Acesse com sua conta ou continue como visitante</p>
 
             <button id="google-login-btn" class="google-btn">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
@@ -35,12 +35,15 @@
                 <button id="login-btn">Entrar</button>
                 <button id="register-btn" class="secondary-btn">Cadastrar</button>
             </div>
+
+            <!-- Botão para usar sem login -->
+            <button id="guest-btn" class="guest-btn">Continuar como Visitante</button>
             
             <p id="auth-error" class="error-msg"></p>
         </div>
     </div>
 
-    <!-- TELA DO CHAT (Exibida somente após o login) -->
+    <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container hidden" role="main">
         <header>
             <h1>Chronical</h1>
