@@ -42,9 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const botReply = data.response || data.reply || data.resposta || data.message;
 
             if (botReply) {
-                appendMessage("Assistente", botReply, "ia");
+                appendMessage("Chronical", botReply, "ia");
             } else {
-                appendMessage("Assistente", "Não foi possível obter uma resposta válida.", "ia");
+                appendMessage("Chronical", "Não foi possível obter uma resposta válida.", "ia");
             }
 
         } catch (error) {
