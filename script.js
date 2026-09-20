@@ -26,22 +26,34 @@ const userDisplayName = document.getElementById("user-display-name");
 const loginBtn = document.getElementById("login-btn");
 const registerBtn = document.getElementById("register-btn");
 const googleLoginBtn = document.getElementById("google-login-btn");
+const guestBtn = document.getElementById("guest-btn");
 const logoutBtn = document.getElementById("logout-btn");
 
 const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
+let isGuestMode = false;
+
 // Monitorizar se o Utilizador está Logado ou Deslogado
 auth.onAuthStateChanged((user) => {
     if (user) {
+        isGuestMode = false;
         authContainer.classList.add("hidden");
         chatContainer.classList.remove("hidden");
         userDisplayName.textContent = user.displayName || user.email;
-    } else {
+    } else if (!isGuestMode) {
         authContainer.classList.remove("hidden");
         chatContainer.classList.add("hidden");
     }
+});
+
+// Continuar como Visitante (Sem Login)
+guestBtn.addEventListener("click", () => {
+    isGuestMode = true;
+    authContainer.classList.add("hidden");
+    chatContainer.classList.remove("hidden");
+    userDisplayName.textContent = "Visitante";
 });
 
 // Login com E-mail e Senha
@@ -77,7 +89,12 @@ googleLoginBtn.addEventListener("click", () => {
 });
 
 // Sair da Conta (Logout)
-logoutBtn.addEventListener("click", () => auth.signOut());
+logoutBtn.addEventListener("click", () => {
+    isGuestMode = false;
+    auth.signOut();
+    authContainer.classList.remove("hidden");
+    chatContainer.classList.add("hidden");
+});
 
 // Função para exibir as mensagens na tela
 function appendMessage(sender, text, type) {
@@ -102,6 +119,40 @@ async function sendMessage() {
     if (!messageText) return;
 
     appendMessage("Você", messageText, "user");
+    userInput.value = "";
+
+    const loadingDiv = document.createElement("div");
+    loadingDiv.classList.add("message", "assistant-message");
+    loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
+    chatBox.appendChild(loadingDiv);
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: messageText })
+        });
+
+        const data = await response.json();
+        if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
+
+        if (data && data.response) {
+            appendMessage("Chronical", data.response, "ia");
+        } else {
+            appendMessage("Chronical", "Não foi possível obter uma resposta.", "ia");
+        }
+    } catch (error) {
+        if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
+        appendMessage("Chronical", "Erro ao conectar com o servidor.", "ia");
+    }
+}
+
+sendBtn.addEventListener("click", sendMessage);
+
+userInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") sendMessage();
+});
     userInput.value = "";
 
     const loadingDiv = document.createElement("div");
