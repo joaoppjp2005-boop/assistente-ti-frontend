@@ -3,26 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assistente Virtual - Projeto Integrado II</title>
+    <title>Chronical</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="chat-container">
         <header class="chat-header">
-            <h1>Chronical</h1>
-            <p>Projeto Integrado II - ADS</p>
+            <h2>Chronical</h2>
         </header>
 
-        <div class="chat-box" id="chatBox">
-            <div class="mensagem ia">
-                <strong>Assistente:</strong> "Olá! Sou o seu assistente virtual. Como posso ajudar você hoje?"
+        <div id="chat-box" class="chat-box">
+            <div class="message assistant-message">
+                <strong>Chronical:</strong> Olá! Sou a Chronical. Como posso ajudar você hoje?
             </div>
         </div>
 
-        <form class="chat-input-area" id="chatForm">
-            <input type="text" id="userInput" placeholder="Digite sua mensagem aqui..." required autocomplete="off">
-            <button type="submit" id="sendBtn">Enviar</button>
-        </form>
+        <div class="chat-input-area">
+            <input type="text" id="user-input" placeholder="Digite sua mensagem aqui..." />
+            <button id="send-btn">Enviar</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
