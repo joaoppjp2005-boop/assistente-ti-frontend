@@ -11,7 +11,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* 100dvh garante altura perfeita no navegador do celular */
     height: 100vh;
     height: 100dvh;
     width: 100vw;
@@ -126,10 +125,6 @@ header h1 {
     outline: none;
 }
 
-#user-input:focus {
-    border-color: #38bdf8;
-}
-
 #send-btn {
     background: #0284c7;
     color: white;
@@ -141,7 +136,7 @@ header h1 {
     cursor: pointer;
 }
 
-/* Otimizações para telas maiores (Computadores e Tablets em modo Paisagem) */
+/* Otimizações para Computadores e Tablets */
 @media (min-width: 768px) {
     .chat-box {
         padding: 24px 15%;
@@ -168,13 +163,14 @@ header h1 {
     }
 }
 
-/* Acessibilidade de foco visual por teclado */
+/* Acessibilidade: Indicador visível de foco para a tecla TAB */
 #user-input:focus-visible,
 #send-btn:focus-visible {
     outline: 3px solid #38bdf8;
     outline-offset: 2px;
 }
 
+/* Acessibilidade: Texto invisível apenas para leitores de ecrã */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -185,49 +181,4 @@ header h1 {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
-}
-    background: rgba(0, 0, 0, 0.3);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-}
-
-.input-container {
-    padding: 20px 10%;
-    background: rgba(30, 41, 59, 0.8);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    gap: 12px;
-}
-
-#user-input {
-    flex: 1;
-    background: rgba(15, 23, 42, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 14px 18px;
-    color: #ffffff;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-#user-input:focus {
-    border-color: #38bdf8;
-}
-
-#send-btn {
-    background: #0284c7;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 0 28px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-#send-btn:hover {
-    background: #0369a1;
 }
