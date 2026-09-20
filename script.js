@@ -4,31 +4,20 @@ const chatBox = document.getElementById("chat-box");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-// Função para formatar o texto do Gemini (Markdown simples para HTML)
-function formatMarkdown(text) {
-    return text
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/^\* (.*$)/gim, '<li>$1</li>')
-        .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
-        .replace(/\n/g, '<br>');
-}
-
 function appendMessage(sender, text, type) {
     const msgDiv = document.createElement("div");
     msgDiv.classList.add("message");
     msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
     
-    if (type === "ia") {
-        msgDiv.innerHTML = `<strong>${sender}:</strong><div class="ia-text">${formatMarkdown(text)}</div>`;
+    if (type === "ia" && typeof marked !== "undefined") {
+        msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
     } else {
         msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
     }
 
     chatBox.appendChild(msgDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
+    return msgDiv;
 }
 
 async function sendMessage() {
@@ -40,7 +29,7 @@ async function sendMessage() {
 
     const loadingDiv = document.createElement("div");
     loadingDiv.classList.add("message", "assistant-message");
-    loadingDiv.innerHTML = "<strong>Chronical:</strong> A pensar...";
+    loadingDiv.innerHTML = "<strong>Chronical:</strong> Pensando...";
     chatBox.appendChild(loadingDiv);
     chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -65,7 +54,7 @@ async function sendMessage() {
         if (chatBox.contains(loadingDiv)) {
             chatBox.removeChild(loadingDiv);
         }
-        appendMessage("Chronical", "Erro ao ligar ao servidor. Tente novamente em instantes.", "ia");
+        appendMessage("Chronical", "Erro ao conectar com o servidor.", "ia");
     }
 }
 
