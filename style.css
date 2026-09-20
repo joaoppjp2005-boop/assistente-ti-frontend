@@ -1,15 +1,22 @@
-.ia-text {
-    margin-top: 5px;
-    line-height: 1.6;
+/* Estilização para formatar mensagens da IA com Markdown */
+.markdown-content p {
+    margin-bottom: 8px;
 }
 
-.ia-text h2, .ia-text h3 {
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
     margin-top: 12px;
     margin-bottom: 6px;
     color: #ffffff;
 }
 
-.ia-text li {
-    margin-left: 15px;
+.markdown-content ul, 
+.markdown-content ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.markdown-content li {
     margin-bottom: 4px;
 }
