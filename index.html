@@ -47,18 +47,14 @@
         <header>
             <h1>Chronical</h1>
             <div class="user-profile">
+                <!-- BOTÃO DE VOZ INTEGRADO NA MESMA BARRA DO TOPO -->
+                <button id="voice-toggle-btn" type="button">
+                    🔈 Voz: OFF
+                </button>
                 <span id="user-display-name"></span>
                 <button id="logout-btn" aria-label="Sair da conta" type="button">Sair</button>
             </div>
         </header>
-
-        <!-- BARRA DE FERRAMENTAS COM O BOTÃO DE VOZ -->
-        <div class="voice-toolbar">
-            <span>Leitura por voz:</span>
-            <button id="voice-toggle-btn" type="button">
-                🔈 Voz: OFF
-            </button>
-        </div>
 
         <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
             <div class="message assistant-message">
@@ -259,3 +255,4 @@
     </script>
 </body>
 </html>
+
