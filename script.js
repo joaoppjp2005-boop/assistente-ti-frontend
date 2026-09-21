@@ -112,6 +112,100 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Exibir Mensagens
+    function appendMessage(sender, text, type) {
+        const msgDiv = document.createElement("div");
+        msgDiv.classList.add("message");
+        msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
+        
+        if (type === "ia" && typeof marked !== "undefined") {
+            msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
+        } else {
+            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+        }
+
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return msgDiv;
+    }
+
+    // Enviar mensagem com Streaming (Respostas em Tempo Real)
+    async function sendMessage() {
+        const messageText = userInput.value.trim();
+        if (!messageText) return;
+
+        appendMessage("Você", messageText, "user");
+        userInput.value = "";
+
+        // Cria a bolha da mensagem da IA vazia
+        const aiMsgDiv = document.createElement("div");
+        aiMsgDiv.classList.add("message", "assistant-message");
+        aiMsgDiv.innerHTML = `<strong>Chronical:</strong> <div class="markdown-content">...</div>`;
+        chatBox.appendChild(aiMsgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        const contentDiv = aiMsgDiv.querySelector(".markdown-content");
+        let fullResponseText = "";
+
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: messageText })
+            });
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n");
+
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const dataStr = line.replace("data: ", "").trim();
+                        if (dataStr === "[DONE]") break;
+
+                        try {
+                            const parsed = JSON.parse(dataStr);
+                            if (parsed.text) {
+                                fullResponseText += parsed.text;
+                                contentDiv.innerHTML = typeof marked !== "undefined" 
+                                    ? marked.parse(fullResponseText) 
+                                    : fullResponseText;
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                            }
+                        } catch (e) {
+                            // Pula chunks incompletos
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            contentDiv.innerHTML = "Erro ao conectar ao servidor.";
+        }
+    }
+
+    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
+    if (userInput) {
+        userInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessage();
+        });
+    }
+});
+        logoutBtn.addEventListener("click", () => {
+            isGuestMode = false;
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                firebase.auth().signOut();
+            }
+            authContainer.classList.remove("hidden");
+            chatContainer.classList.add("hidden");
+        });
+    }
+
     // Mensagens do Chat
     function appendMessage(sender, text, type) {
         const msgDiv = document.createElement("div");
