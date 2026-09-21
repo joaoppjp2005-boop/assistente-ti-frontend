@@ -20,13 +20,13 @@
         </div>
     </div>
 
-    <!-- MODAL DE LOGIN -->
+    <!-- MODAL DE LOGIN / CADASTRO -->
     <div id="auth-modal" class="auth-modal hidden">
         <div class="auth-modal-overlay" id="close-modal-overlay"></div>
         <div class="auth-box">
             <button id="close-modal-btn" class="close-modal-x">&times;</button>
             <h2>Chronical AI</h2>
-            <p>Acesse com sua conta ou continue como visitante</p>
+            <p>Acesse sua conta para salvar seu histórico e perfil</p>
 
             <button id="google-login-btn" class="google-btn" type="button">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
@@ -35,6 +35,7 @@
 
             <div class="divider">ou</div>
 
+            <input type="text" id="auth-name" placeholder="Seu nome (para cadastro)" autocomplete="name" />
             <input type="email" id="auth-email" placeholder="Seu e-mail" autocomplete="email" />
             <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
 
@@ -87,7 +88,7 @@
                 <span></span>
             </button>
 
-            <button id="top-login-btn" class="top-login-btn" type="button">Entrar</button>
+            <button id="top-login-btn" class="top-login-btn" type="button">Fazer Login</button>
         </header>
 
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
@@ -107,14 +108,19 @@
                     <div id="history-list" class="history-list"></div>
                 </div>
 
-                <!-- Rodapé Organizado -->
+                <!-- Rodapé do Menu -->
                 <div class="sidebar-bottom">
-                    <div class="user-info-card">
-                        <span class="user-label">Usuário:</span>
-                        <span id="user-display-name">Visitante</span>
+                    
+                    <!-- Bloco Dinâmico de Perfil (Oculto se for visitante) -->
+                    <div id="user-profile-card" class="user-profile-card hidden">
+                        <div id="user-avatar" class="user-avatar">U</div>
+                        <div class="user-info">
+                            <span id="user-profile-name" class="user-profile-name">Nome do Usuário</span>
+                            <span id="user-profile-email" class="user-profile-email">email@exemplo.com</span>
+                        </div>
                     </div>
 
-                    <!-- Botões na mesma reta -->
+                    <!-- Botões de Ação na mesma reta -->
                     <div class="bottom-actions-row">
                         <button id="settings-btn" class="sidebar-action-btn" type="button">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -124,13 +130,13 @@
                             <span>Configurações</span>
                         </button>
 
-                        <button id="logout-btn" class="sidebar-action-btn logout-btn" type="button">
+                        <button id="auth-action-btn" class="sidebar-action-btn login-btn-style" type="button">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                <polyline points="10 17 15 12 10 7"></polyline>
+                                <line x1="15" y1="12" x2="3" y2="12"></line>
                             </svg>
-                            <span>Sair</span>
+                            <span id="auth-action-text">Fazer Login</span>
                         </button>
                     </div>
                 </div>
@@ -147,11 +153,6 @@
 
         <!-- Barra de Entrada -->
         <footer class="input-container">
-            <div id="attachment-preview" class="attachment-preview hidden">
-                <span id="attachment-name"></span>
-                <button id="remove-attachment-btn" type="button">&times;</button>
-            </div>
-
             <div class="input-wrapper">
                 <label for="file-input" class="action-btn" title="Adicionar arquivo">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -162,19 +163,6 @@
                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
 
                 <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
-
-                <div id="audio-wave-container" class="audio-wave-container hidden">
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                    <span class="wave-bar"></span><span class="wave-bar"></span>
-                </div>
-
-                <button id="stop-audio-btn" type="button" class="stop-audio-btn hidden" title="Cancelar gravação">
-                    <div class="stop-square"></div>
-                </button>
 
                 <button id="mic-btn" type="button" class="action-btn" title="Falar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -188,18 +176,26 @@
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>
                 </button>
-
-                <button id="send-audio-btn" class="send-btn-blue hidden" aria-label="Enviar Áudio" type="button">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="19" x2="12" y2="5"></line>
-                        <polyline points="5 12 12 5 19 12"></polyline>
-                    </svg>
-                </button>
             </div>
         </footer>
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE (Substitua pelos dados do seu projeto Firebase)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
         const BACKEND_URL = "/api/chat";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -207,35 +203,97 @@
             const userInput = document.getElementById("user-input");
             const chatBox = document.getElementById("chat-box");
             const sendBtn = document.getElementById("send-btn");
-            const sendAudioBtn = document.getElementById("send-audio-btn");
-            const micBtn = document.getElementById("mic-btn");
-            const stopAudioBtn = document.getElementById("stop-audio-btn");
-            const audioWaveContainer = document.getElementById("audio-wave-container");
 
-            /* Estado de Leitura Automática */
-            const autoReadToggle = document.getElementById("auto-read-toggle");
-            let autoReadEnabled = localStorage.getItem("chronical_auto_read") === "true";
-            
-            if (autoReadToggle) {
-                autoReadToggle.checked = autoReadEnabled;
-                autoReadToggle.addEventListener("change", (e) => {
-                    autoReadEnabled = e.target.checked;
-                    localStorage.setItem("chronical_auto_read", autoReadEnabled);
-                    if (!autoReadEnabled && window.speechSynthesis) {
-                        window.speechSynthesis.cancel();
+            // Elementos de Autenticação / Perfil
+            const authModal = document.getElementById("auth-modal");
+            const topLoginBtn = document.getElementById("top-login-btn");
+            const authActionBtn = document.getElementById("auth-action-btn");
+            const authActionText = document.getElementById("auth-action-text");
+            const userProfileCard = document.getElementById("user-profile-card");
+            const userProfileName = document.getElementById("user-profile-name");
+            const userProfileEmail = document.getElementById("user-profile-email");
+            const userAvatar = document.getElementById("user-avatar");
+            const authError = document.getElementById("auth-error");
+
+            /* Estado de Autenticação Dinâmico */
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Usuário Autenticado: Atualiza Perfil
+                    const name = user.displayName || user.email.split('@')[0];
+                    userProfileName.textContent = name;
+                    userProfileEmail.textContent = user.email;
+                    userAvatar.textContent = name.charAt(0).toUpperCase();
+
+                    userProfileCard.classList.remove("hidden");
+                    authActionText.textContent = "Sair";
+                    if (topLoginBtn) topLoginBtn.style.display = "none";
+                } else {
+                    // Visitante: Oculta Perfil
+                    userProfileCard.classList.add("hidden");
+                    authActionText.textContent = "Fazer Login";
+                    if (topLoginBtn) topLoginBtn.style.display = "block";
+                }
+            });
+
+            // Ação do Botão Login/Sair do Menu e Superior
+            function handleAuthClick() {
+                if (auth.currentUser) {
+                    auth.signOut();
+                } else {
+                    toggleSidebar(false);
+                    authModal.classList.remove("hidden");
+                }
+            }
+
+            if (topLoginBtn) topLoginBtn.addEventListener("click", handleAuthClick);
+            if (authActionBtn) authActionBtn.addEventListener("click", handleAuthClick);
+
+            // Login com Email/Senha
+            document.getElementById("login-btn").addEventListener("click", async () => {
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao entrar: " + err.message;
+                }
+            });
+
+            // Cadastro de Usuário
+            document.getElementById("register-btn").addEventListener("click", async () => {
+                const name = document.getElementById("auth-name").value;
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    if (name) {
+                        await userCredential.user.updateProfile({ displayName: name });
                     }
-                });
-            }
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao cadastrar: " + err.message;
+                }
+            });
 
-            function speakText(text) {
-                if (!autoReadEnabled || !('speechSynthesis' in window)) return;
-                window.speechSynthesis.cancel(); // Para fala anterior se houver
-                const cleanText = text.replace(/[*_#`~]/g, ''); // Limpa markdown
-                const utterance = new SpeechSynthesisUtterance(cleanText);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
+            // Login com Google
+            document.getElementById("google-login-btn").addEventListener("click", async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro no Google Login: " + err.message;
+                }
+            });
+
+            // Fechar Modais
+            document.getElementById("close-modal-btn").addEventListener("click", () => authModal.classList.add("hidden"));
+            document.getElementById("close-modal-overlay").addEventListener("click", () => authModal.classList.add("hidden"));
 
             /* Splash Screen */
             setTimeout(() => {
@@ -245,96 +303,6 @@
                     if (userInput) userInput.focus();
                 }, 600);
             }, 2200);
-
-            /* Modal de Login */
-            const topLoginBtn = document.getElementById("top-login-btn");
-            const authModal = document.getElementById("auth-modal");
-            const closeModalBtn = document.getElementById("close-modal-btn");
-            const closeModalOverlay = document.getElementById("close-modal-overlay");
-
-            if (topLoginBtn) topLoginBtn.addEventListener("click", () => authModal.classList.remove("hidden"));
-            if (closeModalBtn) closeModalBtn.addEventListener("click", () => authModal.classList.add("hidden"));
-            if (closeModalOverlay) closeModalOverlay.addEventListener("click", () => authModal.classList.add("hidden"));
-
-            /* Modal de Configurações */
-            const settingsBtn = document.getElementById("settings-btn");
-            const settingsModal = document.getElementById("settings-modal");
-            const closeSettingsBtn = document.getElementById("close-settings-btn");
-            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
-
-            if (settingsBtn) {
-                settingsBtn.addEventListener("click", () => {
-                    toggleSidebar(false);
-                    settingsModal.classList.remove("hidden");
-                });
-            }
-            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", () => settingsModal.classList.add("hidden"));
-            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", () => settingsModal.classList.add("hidden"));
-
-            /* Reconhecimento de Voz */
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            let recognition = null;
-            let isListeningSpeech = false;
-
-            if (SpeechRecognition) {
-                recognition = new SpeechRecognition();
-                recognition.lang = 'pt-BR';
-                recognition.continuous = true;
-                recognition.interimResults = true;
-
-                recognition.onstart = () => {
-                    isListeningSpeech = true;
-                    userInput.classList.add("hidden");
-                    micBtn.classList.add("hidden");
-                    sendBtn.classList.add("hidden");
-                    audioWaveContainer.classList.remove("hidden");
-                    stopAudioBtn.classList.remove("hidden");
-                    sendAudioBtn.classList.remove("hidden");
-                };
-
-                recognition.onresult = (event) => {
-                    let transcript = "";
-                    for (let i = event.resultIndex; i < event.results.length; ++i) {
-                        transcript += event.results[i][0].transcript;
-                    }
-                    userInput.value = transcript;
-                };
-
-                recognition.onerror = recognition.onend = () => {
-                    if (!userInput.value.trim()) resetAudioUI();
-                };
-            }
-
-            function resetAudioUI() {
-                isListeningSpeech = false;
-                userInput.classList.remove("hidden");
-                micBtn.classList.remove("hidden");
-                sendBtn.classList.remove("hidden");
-                audioWaveContainer.classList.add("hidden");
-                stopAudioBtn.classList.add("hidden");
-                sendAudioBtn.classList.add("hidden");
-            }
-
-            if (micBtn) {
-                micBtn.addEventListener("click", () => {
-                    if (SpeechRecognition && !isListeningSpeech) recognition.start();
-                });
-            }
-
-            if (stopAudioBtn) {
-                stopAudioBtn.addEventListener("click", () => {
-                    if (recognition && isListeningSpeech) recognition.stop();
-                    userInput.value = "";
-                    resetAudioUI();
-                });
-            }
-
-            if (sendAudioBtn) {
-                sendAudioBtn.addEventListener("click", () => {
-                    if (recognition && isListeningSpeech) recognition.stop();
-                    sendMessage();
-                });
-            }
 
             /* Menu Lateral */
             const menuBtn = document.getElementById("menu-btn");
@@ -356,62 +324,17 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            function appendMessageUI(sender, text, type) {
-                const msgDiv = document.createElement("div");
-                msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
-                let header = `<div class="message-header">${sender}</div>`;
-
-                if (type === "ia" && typeof marked !== "undefined") {
-                    msgDiv.innerHTML = `${header}<div class="markdown-content">${marked.parse(text)}</div>`;
-                } else {
-                    msgDiv.innerHTML = `${header}${text}`;
-                }
-                chatBox.appendChild(msgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-
+            /* Envio de Mensagem */
             async function sendMessage() {
                 const messageText = userInput.value.trim();
                 if (!messageText) return;
 
-                appendMessageUI("Você", messageText, "user");
+                const msgDiv = document.createElement("div");
+                msgDiv.classList.add("message", "user-message");
+                msgDiv.innerHTML = `<div class="message-header">Você</div>${messageText}`;
+                chatBox.appendChild(msgDiv);
                 userInput.value = "";
-                resetAudioUI();
-
-                const aiMsgDiv = document.createElement("div");
-                aiMsgDiv.classList.add("message", "assistant-message");
-                aiMsgDiv.innerHTML = `
-                    <div class="message-header">CHRONICAL</div>
-                    <div class="markdown-content">
-                        <div class="typing-dots"><span></span><span></span><span></span></div>
-                    </div>`;
-                chatBox.appendChild(aiMsgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
-
-                const contentSpan = aiMsgDiv.querySelector(".markdown-content");
-
-                try {
-                    const response = await fetch(BACKEND_URL, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: messageText })
-                    });
-
-                    const data = await response.json();
-                    if (!response.ok) {
-                        contentSpan.innerHTML = `<span style="color:#f85149;">${data.error || "Erro no servidor."}</span>`;
-                        return;
-                    }
-
-                    const responseText = data.text || "";
-                    contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(responseText) : responseText;
-                    chatBox.scrollTop = chatBox.scrollHeight;
-
-                    speakText(responseText);
-
-                } catch (error) {
-                    contentSpan.innerHTML = `<span style="color:#f85149;">Erro de conexão ao servidor.</span>`;
-                }
             }
 
             if (sendBtn) sendBtn.addEventListener("click", sendMessage);
