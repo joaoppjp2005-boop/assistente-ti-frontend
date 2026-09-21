@@ -2,24 +2,21 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Chronical - Assistente Virtual</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- Biblioteca para formatar texto Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- SDKs do Firebase Auth (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN E CADASTRO -->
+    <!-- TELA DE LOGIN -->
     <div id="auth-container" class="auth-container">
         <div class="auth-box">
             <h2>Chronical AI</h2>
-            <p>Aceda com a sua conta ou continue como visitante</p>
+            <p>Acesse com sua conta ou continue como visitante</p>
 
             <button id="google-login-btn" class="google-btn" type="button">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
@@ -37,7 +34,6 @@
             </div>
 
             <button id="guest-btn" class="guest-btn" type="button" onclick="entrarComoVisitanteDirecto()">Continuar como Visitante</button>
-            
             <p id="auth-error" class="error-msg"></p>
         </div>
     </div>
@@ -45,16 +41,19 @@
     <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container hidden" role="main">
         <header>
-            <h1>Chronical</h1>
+            <!-- 3 Barrinhas no Lado Esquerdo -->
             <button id="menu-btn" class="menu-toggle-btn" aria-label="Abrir menu" type="button">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
+            <h1>Chronical</h1>
+            <div style="width: 28px;"></div> <!-- Espaçador para centralizar o título -->
         </header>
 
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
+        <!-- Sidebar deslizando da esquerda -->
         <aside id="sidebar-menu" class="sidebar-menu">
             <div class="sidebar-header">
                 <h3>Opções</h3>
@@ -62,8 +61,16 @@
             </div>
             <div class="sidebar-content">
                 <div class="user-info-card">
-                    <span class="user-label">Utilizador</span>
+                    <span class="user-label">Usuário</span>
                     <span id="user-display-name">Visitante</span>
+                </div>
+
+                <div class="menu-item">
+                    <span>Enviar Áudio como:</span>
+                    <select id="audio-mode-select" class="select-input">
+                        <option value="text">Texto (Transcrição)</option>
+                        <option value="voice">Áudio Gravado</option>
+                    </select>
                 </div>
 
                 <div class="menu-item">
@@ -72,12 +79,12 @@
                 </div>
 
                 <div class="logout-section">
-                    <button id="logout-btn" aria-label="Sair da conta" type="button">Sair da Conta</button>
+                    <button id="logout-btn" type="button">Sair da Conta</button>
                 </div>
             </div>
         </aside>
 
-        <main id="chat-box" class="chat-box" role="log" aria-live="polite">
+        <main id="chat-box" class="chat-box">
             <div class="message assistant-message">
                 <div class="message-header">Chronical</div>
                 <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
@@ -91,14 +98,25 @@
             </div>
 
             <div class="input-wrapper">
-                <label for="file-input" class="attach-btn" title="Anexar ficheiro">📎</label>
+                <!-- Ícone de Anexo mudado para um mais (+) -->
+                <label for="file-input" class="attach-btn" title="Adicionar arquivo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </label>
                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
 
                 <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
 
-                <button id="mic-btn" type="button" class="icon-btn" title="Falar por voz">🎤</button>
+                <!-- Ícone do Microfone Exatamente igual ao modelo da imagem -->
+                <button id="mic-btn" type="button" class="icon-btn" title="Falar / Gravar">
+                    <svg width="20" height="22" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.53 16.39 17.44 13 17.93V20H17V22H7V20H11V17.93C7.61 17.44 5 14.53 5 11H7C7 13.76 9.24 16 12 16C14.76 16 17 13.76 17 11H19Z"/>
+                    </svg>
+                </button>
                 
-                <button id="send-btn" class="send-btn-icon" aria-label="Enviar mensagem" type="button">
+                <button id="send-btn" class="send-btn-icon" aria-label="Enviar" type="button">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
@@ -113,48 +131,30 @@
             document.getElementById("user-display-name").textContent = "Visitante";
         }
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCAbWdM9bvpVH8od0Ls0nipAcjMmrKDP8M",
-            authDomain: "chronical-624a2.firebaseapp.com",
-            projectId: "chronical-624a2",
-            storageBucket: "chronical-624a2.firebasestorage.app",
-            messagingSenderId: "919413941674",
-            appId: "1:919413941674:web:a2e56297e56f666b44f7d3",
-            measurementId: "G-KP1PZPM94N"
-        };
-
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            try { firebase.initializeApp(firebaseConfig); } catch(e){}
-        }
-
         const BACKEND_URL = "/api/chat";
 
         document.addEventListener("DOMContentLoaded", () => {
-            const authEmail = document.getElementById("auth-email");
-            const authPassword = document.getElementById("auth-password");
-            const authError = document.getElementById("auth-error");
-            const loginBtn = document.getElementById("login-btn");
-            const registerBtn = document.getElementById("register-btn");
-            const googleLoginBtn = document.getElementById("google-login-btn");
-            const logoutBtn = document.getElementById("logout-btn");
             const chatBox = document.getElementById("chat-box");
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
-            const voiceToggleBtn = document.getElementById("voice-toggle-btn");
-
             const fileInput = document.getElementById("file-input");
             const attachmentPreview = document.getElementById("attachment-preview");
             const attachmentName = document.getElementById("attachment-name");
             const removeAttachmentBtn = document.getElementById("remove-attachment-btn");
             const micBtn = document.getElementById("mic-btn");
+            const audioModeSelect = document.getElementById("audio-mode-select");
 
             let currentFile = null;
+            let mediaRecorder = null;
+            let audioChunks = [];
+            let isRecordingAudio = false;
 
+            /* Gerenciamento de Anexo */
             fileInput.addEventListener("change", (e) => {
                 const file = e.target.files[0];
                 if (file) {
                     currentFile = file;
-                    attachmentName.textContent = `📎 ${file.name}`;
+                    attachmentName.textContent = `📄 ${file.name}`;
                     attachmentPreview.classList.remove("hidden");
                 }
             });
@@ -165,9 +165,10 @@
                 attachmentPreview.classList.add("hidden");
             });
 
+            /* Lógica de Microfone: Alterna entre Reconhecimento de Texto e Gravação de Áudio */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             let recognition = null;
-            let isListening = false;
+            let isListeningSpeech = false;
 
             if (SpeechRecognition) {
                 recognition = new SpeechRecognition();
@@ -175,9 +176,9 @@
                 recognition.continuous = false;
 
                 recognition.onstart = () => {
-                    isListening = true;
+                    isListeningSpeech = true;
                     micBtn.classList.add("recording");
-                    userInput.placeholder = "A ouvir...";
+                    userInput.placeholder = "Ouvindo...";
                 };
 
                 recognition.onresult = (event) => {
@@ -185,19 +186,55 @@
                 };
 
                 recognition.onerror = recognition.onend = () => {
-                    isListening = false;
+                    isListeningSpeech = false;
                     micBtn.classList.remove("recording");
                     userInput.placeholder = "Pergunte algo à Chronical...";
                 };
-
-                micBtn.addEventListener("click", () => {
-                    if (isListening) recognition.stop();
-                    else recognition.start();
-                });
-            } else {
-                micBtn.style.display = "none";
             }
 
+            micBtn.addEventListener("click", async () => {
+                const mode = audioModeSelect.value;
+
+                if (mode === "text") {
+                    if (SpeechRecognition) {
+                        if (isListeningSpeech) recognition.stop();
+                        else recognition.start();
+                    } else {
+                        alert("Reconhecimento de voz em texto não é suportado neste navegador.");
+                    }
+                } else {
+                    // Modo Áudio Gravado
+                    if (!isRecordingAudio) {
+                        try {
+                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                            mediaRecorder = new MediaRecorder(stream);
+                            audioChunks = [];
+
+                            mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
+                            mediaRecorder.onstop = () => {
+                                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+                                const audioUrl = URL.createObjectURL(audioBlob);
+                                appendAudioMessage("Você", audioUrl, "user");
+                                stream.getTracks().forEach(track => track.stop());
+                            };
+
+                            mediaRecorder.start();
+                            isRecordingAudio = true;
+                            micBtn.classList.add("recording");
+                            userInput.placeholder = "Gravando áudio...";
+                        } catch (err) {
+                            alert("Permissão de microfone negada ou não suportada.");
+                        }
+                    } else {
+                        mediaRecorder.stop();
+                        isRecordingAudio = false;
+                        micBtn.classList.remove("recording");
+                        userInput.placeholder = "Pergunte algo à Chronical...";
+                    }
+                }
+            });
+
+            /* Menu Lateral à Esquerda */
             const menuBtn = document.getElementById("menu-btn");
             const closeMenuBtn = document.getElementById("close-menu-btn");
             const sidebarMenu = document.getElementById("sidebar-menu");
@@ -217,75 +254,15 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            let isVoiceEnabled = false;
-
-            if (voiceToggleBtn) {
-                voiceToggleBtn.addEventListener("click", () => {
-                    isVoiceEnabled = !isVoiceEnabled;
-                    voiceToggleBtn.textContent = isVoiceEnabled ? "🔊 ON" : "🔈 OFF";
-                    voiceToggleBtn.style.backgroundColor = isVoiceEnabled ? "#238636" : "#21262d";
-                    
-                    if (!isVoiceEnabled && 'speechSynthesis' in window) {
-                        window.speechSynthesis.cancel();
-                    }
-                });
-            }
-
-            function speakText(text) {
-                if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
-                window.speechSynthesis.cancel();
-                const cleanText = text.replace(/[*#_`~]/g, '');
-                const utterance = new SpeechSynthesisUtterance(cleanText);
-                utterance.lang = 'pt-BR';
-                utterance.rate = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
-
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().onAuthStateChanged((user) => {
-                    if (user) {
-                        document.getElementById("auth-container").style.display = "none";
-                        document.getElementById("chat-container").classList.remove("hidden");
-                        document.getElementById("chat-container").style.display = "flex";
-                        document.getElementById("user-display-name").textContent = user.displayName || user.email;
-                    }
-                });
-            }
-
-            if (loginBtn) {
-                loginBtn.addEventListener("click", () => {
-                    const email = authEmail.value.trim();
-                    const password = authPassword.value.trim();
-                    if (!email || !password) return authError.textContent = "Preencha e-mail e senha.";
-                    firebase.auth().signInWithEmailAndPassword(email, password)
-                        .catch(err => authError.textContent = "Erro: " + err.message);
-                });
-            }
-
-            if (registerBtn) {
-                registerBtn.addEventListener("click", () => {
-                    const email = authEmail.value.trim();
-                    const password = authPassword.value.trim();
-                    if (!email || !password) return authError.textContent = "Preencha e-mail e senha.";
-                    firebase.auth().createUserWithEmailAndPassword(email, password)
-                        .then(() => alert("Conta criada!"))
-                        .catch(err => authError.textContent = "Erro: " + err.message);
-                });
-            }
-
-            if (googleLoginBtn) {
-                googleLoginBtn.addEventListener("click", () => {
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    firebase.auth().signInWithPopup(provider)
-                        .catch(err => authError.textContent = "Erro Google: " + err.message);
-                });
-            }
-
-            if (logoutBtn) {
-                logoutBtn.addEventListener("click", () => {
-                    if (typeof firebase !== 'undefined' && firebase.auth) firebase.auth().signOut();
-                    window.location.reload();
-                });
+            function appendAudioMessage(sender, audioUrl, type) {
+                const msgDiv = document.createElement("div");
+                msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
+                msgDiv.innerHTML = `
+                    <div class="message-header">${sender}</div>
+                    <audio controls src="${audioUrl}" style="max-width: 100%; margin-top: 4px;"></audio>
+                `;
+                chatBox.appendChild(msgDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
             }
 
             function appendMessage(sender, text, type, fileName = null) {
@@ -318,7 +295,6 @@
                 fileInput.value = "";
                 attachmentPreview.classList.add("hidden");
 
-                // Indicador de carregamento suave
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
                 aiMsgDiv.innerHTML = `
@@ -347,7 +323,6 @@
 
                     if (data.text) {
                         contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
-                        speakText(data.text);
                     } else {
                         contentSpan.innerHTML = "Resposta vazia da IA.";
                     }
@@ -368,4 +343,3 @@
     </script>
 </body>
 </html>
-
