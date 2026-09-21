@@ -57,17 +57,15 @@
             </div>
             
             <div class="settings-body">
-                <!-- Menu de Abas -->
                 <nav class="settings-tabs">
                     <button class="tab-btn active" data-tab="general">Geral</button>
                 </nav>
 
-                <!-- Conteúdo da Aba Geral -->
                 <div class="tab-content active" id="tab-general">
                     <div class="setting-item">
                         <div class="setting-info">
                             <span class="setting-title">Leitura automática</span>
-                            <span class="setting-desc">Lê automaticamente as respostas da IA usando voz sintética</span>
+                            <span class="setting-desc">Lê automaticamente as respostas da IA</span>
                         </div>
                         <label class="switch">
                             <input type="checkbox" id="auto-read-toggle">
@@ -82,7 +80,6 @@
     <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container" role="main">
         
-        <!-- Cabeçalho -->
         <header class="top-bar">
             <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
                 <span></span>
@@ -106,27 +103,35 @@
                 <button id="new-chat-btn" class="new-chat-btn" type="button">+ Novo Chat</button>
 
                 <div class="history-section">
-                    <span class="section-label">Histórico</span>
+                    <span class="section-label">Mensagens Anteriores</span>
                     <div id="history-list" class="history-list"></div>
                 </div>
 
+                <!-- Rodapé Organizado -->
                 <div class="sidebar-bottom">
                     <div class="user-info-card">
-                        <span class="user-label">Usuário</span>
+                        <span class="user-label">Usuário:</span>
                         <span id="user-display-name">Visitante</span>
                     </div>
 
-                    <!-- Botão Configurações -->
-                    <button id="settings-btn" class="sidebar-action-btn" type="button">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
-                        <span>Configurações</span>
-                    </button>
+                    <!-- Botões na mesma reta -->
+                    <div class="bottom-actions-row">
+                        <button id="settings-btn" class="sidebar-action-btn" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            <span>Configurações</span>
+                        </button>
 
-                    <div class="logout-section">
-                        <button id="logout-btn" type="button">Sair da Conta</button>
+                        <button id="logout-btn" class="sidebar-action-btn logout-btn" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                <polyline points="16 17 21 12 16 7"></polyline>
+                                <line x1="21" y1="12" x2="9" y2="12"></line>
+                            </svg>
+                            <span>Sair</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -210,6 +215,7 @@
             /* Estado de Leitura Automática */
             const autoReadToggle = document.getElementById("auto-read-toggle");
             let autoReadEnabled = localStorage.getItem("chronical_auto_read") === "true";
+            
             if (autoReadToggle) {
                 autoReadToggle.checked = autoReadEnabled;
                 autoReadToggle.addEventListener("change", (e) => {
@@ -223,11 +229,11 @@
 
             function speakText(text) {
                 if (!autoReadEnabled || !('speechSynthesis' in window)) return;
-                window.speechSynthesis.cancel();
-                // Limpa marcações markdown simples para a voz
-                const cleanText = text.replace(/[*_#`~]/g, '');
+                window.speechSynthesis.cancel(); // Para fala anterior se houver
+                const cleanText = text.replace(/[*_#`~]/g, ''); // Limpa markdown
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.lang = 'pt-BR';
+                utterance.rate = 1.0;
                 window.speechSynthesis.speak(utterance);
             }
 
@@ -401,7 +407,6 @@
                     contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(responseText) : responseText;
                     chatBox.scrollTop = chatBox.scrollHeight;
 
-                    /* Executa leitura automática se estiver habilitada */
                     speakText(responseText);
 
                 } catch (error) {
