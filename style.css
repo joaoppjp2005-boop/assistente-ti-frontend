@@ -19,7 +19,7 @@ body {
 
 .hidden { display: none !important; }
 
-/* CABEÇALHO SUPERIOR ( BARRINHAS + BOTÃO ENTRAR ) */
+/* CABEÇALHO SUPERIOR ( 3 BARRINHAS + BOTÃO ENTRAR NA RETA ) */
 .top-bar {
     position: absolute;
     top: 0;
@@ -55,19 +55,23 @@ body {
     background: #15803d;
     color: #ffffff;
     border: none;
-    padding: 6px 16px;
+    padding: 7px 18px;
     border-radius: 20px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.1s;
 }
 
 .top-login-btn:hover {
     background: #166534;
 }
 
-/* MODAL DE LOGIN FLUTUANTE */
+.top-login-btn:active {
+    transform: scale(0.96);
+}
+
+/* MODAL DE LOGIN (SOMENTE QUANDO CLICA EM ENTRAR) */
 .auth-modal {
     position: fixed;
     top: 0; left: 0;
@@ -167,31 +171,34 @@ body {
     position: relative;
 }
 
-/* ANIMAÇÃO DE BEM-VINDO AO ENTRAR */
+/* ANIMAÇÃO DE BEM-VINDO AO ENTRAR (ENTRA SUAVE SEM BLOQUEAR NADA) */
 .welcome-banner {
     text-align: center;
-    margin: 20px 0 10px 0;
-    animation: fadeInDown 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin: 10px 0 16px 0;
+    pointer-events: none;
+    animation: welcomeEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .welcome-text {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 600;
     color: #8b949e;
+    letter-spacing: -0.2px;
 }
 
 .welcome-text .highlight {
     color: #22c55e;
+    text-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
 }
 
-@keyframes fadeInDown {
+@keyframes welcomeEntrance {
     0% {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(-16px) scale(0.97);
     }
     100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -404,3 +411,4 @@ body {
     cursor: pointer;
     flex-shrink: 0;
 }
+
