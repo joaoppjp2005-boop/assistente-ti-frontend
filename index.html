@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÕES (MELHORADO) -->
+    <!-- MODAL DE CONFIGURAÇÕES -->
     <div id="settings-modal" class="settings-modal hidden">
         <div class="settings-modal-overlay" id="close-settings-overlay"></div>
         <div class="settings-box">
@@ -58,12 +58,10 @@
             </div>
             
             <div class="settings-body">
-                <!-- Navegação de Abas -->
                 <nav class="settings-tabs">
-                    <button class="tab-btn active" data-tab="tab-general">Geral</button>
+                    <button class="tab-btn active" data-tab="general">Geral</button>
                 </nav>
 
-                <!-- Conteúdo da Aba Geral -->
                 <div class="tab-content active" id="tab-general">
                     <div class="setting-item">
                         <div class="setting-info">
@@ -113,7 +111,7 @@
                 <!-- Rodapé do Menu -->
                 <div class="sidebar-bottom">
                     
-                    <!-- Bloco Dinâmico de Perfil -->
+                    <!-- Bloco Dinâmico de Perfil (Oculto se for visitante) -->
                     <div id="user-profile-card" class="user-profile-card hidden">
                         <div id="user-avatar" class="user-avatar">U</div>
                         <div class="user-info">
@@ -122,7 +120,7 @@
                         </div>
                     </div>
 
-                    <!-- Botões de Ação -->
+                    <!-- Botões de Ação na mesma reta -->
                     <div class="bottom-actions-row">
                         <button id="settings-btn" class="sidebar-action-btn" type="button">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -183,6 +181,7 @@
     </div>
 
     <script>
+        // CONFIGURAÇÃO DO FIREBASE (Substitua pelos dados do seu projeto Firebase)
         const firebaseConfig = {
             apiKey: "SUA_API_KEY",
             authDomain: "SEU_PROJETO.firebaseapp.com",
@@ -196,6 +195,8 @@
             firebase.initializeApp(firebaseConfig);
         }
         const auth = firebase.auth();
+
+        const BACKEND_URL = "/api/chat";
 
         document.addEventListener("DOMContentLoaded", () => {
             const splashScreen = document.getElementById("splash-screen");
@@ -214,29 +215,10 @@
             const userAvatar = document.getElementById("user-avatar");
             const authError = document.getElementById("auth-error");
 
-            // Elementos de Configurações
-            const settingsBtn = document.getElementById("settings-btn");
-            const settingsModal = document.getElementById("settings-modal");
-            const closeSettingsBtn = document.getElementById("close-settings-btn");
-            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
-
-            /* --- LÓGICA DAS CONFIGURAÇÕES --- */
-            function openSettings() {
-                toggleSidebar(false);
-                if (settingsModal) settingsModal.classList.remove("hidden");
-            }
-
-            function closeSettings() {
-                if (settingsModal) settingsModal.classList.add("hidden");
-            }
-
-            if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
-            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
-            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", closeSettings);
-
-            /* --- ESTADO DE AUTENTICAÇÃO E PERFIL --- */
+            /* Estado de Autenticação Dinâmico */
             auth.onAuthStateChanged((user) => {
                 if (user) {
+                    // Usuário Autenticado: Atualiza Perfil
                     const name = user.displayName || user.email.split('@')[0];
                     userProfileName.textContent = name;
                     userProfileEmail.textContent = user.email;
@@ -246,13 +228,14 @@
                     authActionText.textContent = "Sair";
                     if (topLoginBtn) topLoginBtn.style.display = "none";
                 } else {
+                    // Visitante: Oculta Perfil
                     userProfileCard.classList.add("hidden");
                     authActionText.textContent = "Fazer Login";
                     if (topLoginBtn) topLoginBtn.style.display = "block";
                 }
             });
 
-            // Ação do Botão Login/Sair
+            // Ação do Botão Login/Sair do Menu e Superior
             function handleAuthClick() {
                 if (auth.currentUser) {
                     auth.signOut();
@@ -308,11 +291,11 @@
                 }
             });
 
-            // Fechar Modal de Auth
+            // Fechar Modais
             document.getElementById("close-modal-btn").addEventListener("click", () => authModal.classList.add("hidden"));
             document.getElementById("close-modal-overlay").addEventListener("click", () => authModal.classList.add("hidden"));
 
-            /* --- SPLASH SCREEN --- */
+            /* Splash Screen */
             setTimeout(() => {
                 splashScreen.classList.add("fade-out");
                 setTimeout(() => {
@@ -321,7 +304,7 @@
                 }, 600);
             }, 2200);
 
-            /* --- MENU LATERAL --- */
+            /* Menu Lateral */
             const menuBtn = document.getElementById("menu-btn");
             const closeMenuBtn = document.getElementById("close-menu-btn");
             const sidebarMenu = document.getElementById("sidebar-menu");
@@ -341,7 +324,7 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            /* --- CHAT / MENSAGENS --- */
+            /* Envio de Mensagem */
             async function sendMessage() {
                 const messageText = userInput.value.trim();
                 if (!messageText) return;
