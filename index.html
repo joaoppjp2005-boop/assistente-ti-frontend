@@ -12,9 +12,11 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
-    <div id="auth-container" class="auth-container">
+    <!-- MODAL DE LOGIN (Abre apenas ao clicar no botão "Entrar" do topo) -->
+    <div id="auth-modal" class="auth-modal hidden">
+        <div class="auth-modal-overlay" id="close-modal-overlay"></div>
         <div class="auth-box">
+            <button id="close-modal-btn" class="close-modal-x">&times;</button>
             <h2>Chronical AI</h2>
             <p>Acesse com sua conta ou continue como visitante</p>
 
@@ -33,20 +35,23 @@
                 <button id="register-btn" class="secondary-btn" type="button">Cadastrar</button>
             </div>
 
-            <button id="guest-btn" class="guest-btn" type="button" onclick="entrarComoVisitanteDirecto()">Continuar como Visitante</button>
             <p id="auth-error" class="error-msg"></p>
         </div>
     </div>
 
-    <!-- TELA DO CHAT -->
-    <div id="chat-container" class="chat-container hidden" role="main">
+    <!-- TELA DO CHAT (Exibida diretamente) -->
+    <div id="chat-container" class="chat-container" role="main">
         
-        <!-- Botão Flutuante de 3 Barrinhas (Sem Barra de Cabeçalho) -->
-        <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
+        <!-- Cabeçalho Transparente: 3 Barrinhas (Esquerda) e Botão Entrar (Direita) -->
+        <header class="top-bar">
+            <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <button id="top-login-btn" class="top-login-btn" type="button">Entrar</button>
+        </header>
 
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
@@ -76,8 +81,14 @@
             </div>
         </aside>
 
-        <!-- Área das Mensagens -->
+        <!-- Área das Mensagens com Animação de Boas-Vindas -->
         <main id="chat-box" class="chat-box">
+            
+            <!-- Animação de Entrada "Bem-vindo à Chronical I.A" -->
+            <div id="welcome-banner" class="welcome-banner">
+                <h1 class="welcome-text">Bem-vindo à <span class="highlight">Chronical I.A</span></h1>
+            </div>
+
             <div class="message assistant-message">
                 <div class="message-header">CHRONICAL</div>
                 <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
@@ -152,13 +163,6 @@
     </div>
 
     <script>
-        function entrarComoVisitanteDirecto() {
-            document.getElementById("auth-container").style.display = "none";
-            document.getElementById("chat-container").classList.remove("hidden");
-            document.getElementById("chat-container").style.display = "flex";
-            document.getElementById("user-display-name").textContent = "Visitante";
-        }
-
         const BACKEND_URL = "/api/chat";
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -166,17 +170,21 @@
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const sendAudioBtn = document.getElementById("send-audio-btn");
-            const fileInput = document.getElementById("file-input");
-            const attachmentPreview = document.getElementById("attachment-preview");
-            const attachmentName = document.getElementById("attachment-name");
-            const removeAttachmentBtn = document.getElementById("remove-attachment-btn");
             const micBtn = document.getElementById("mic-btn");
             const stopAudioBtn = document.getElementById("stop-audio-btn");
             const audioWaveContainer = document.getElementById("audio-wave-container");
 
-            let currentFile = null;
+            /* Controle do Modal de Login */
+            const topLoginBtn = document.getElementById("top-login-btn");
+            const authModal = document.getElementById("auth-modal");
+            const closeModalBtn = document.getElementById("close-modal-btn");
+            const closeModalOverlay = document.getElementById("close-modal-overlay");
 
-            /* Gerenciamento do Modo de Gravação de Áudio */
+            topLoginBtn.addEventListener("click", () => authModal.classList.remove("hidden"));
+            closeModalBtn.addEventListener("click", () => authModal.classList.add("hidden"));
+            closeModalOverlay.addEventListener("click", () => authModal.classList.add("hidden"));
+
+            /* Gravação de Áudio */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             let recognition = null;
             let isListeningSpeech = false;
@@ -189,7 +197,6 @@
 
                 recognition.onstart = () => {
                     isListeningSpeech = true;
-                    // Alterna para a barra de áudio
                     userInput.classList.add("hidden");
                     micBtn.classList.add("hidden");
                     sendBtn.classList.add("hidden");
@@ -281,9 +288,9 @@
 
             async function sendMessage() {
                 const messageText = userInput.value.trim();
-                if (!messageText && !currentFile) return;
+                if (!messageText) return;
 
-                appendMessageUI("Você", messageText || "(Arquivo enviado)", "user");
+                appendMessageUI("Você", messageText, "user");
 
                 userInput.value = "";
                 resetAudioUI();
