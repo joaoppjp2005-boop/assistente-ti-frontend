@@ -46,15 +46,41 @@
     <div id="chat-container" class="chat-container hidden" role="main">
         <header>
             <h1>Chronical</h1>
-            <div class="user-profile">
-                <!-- BOTÃO DE VOZ INTEGRADO NA MESMA BARRA DO TOPO -->
-                <button id="voice-toggle-btn" type="button">
-                    🔈 Voz: OFF
-                </button>
-                <span id="user-display-name"></span>
-                <button id="logout-btn" aria-label="Sair da conta" type="button">Sair</button>
-            </div>
+            <!-- BOTÃO DAS 3 BARRINHAS (HAMBÚRGUER) -->
+            <button id="menu-btn" class="menu-toggle-btn" aria-label="Abrir menu" type="button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </header>
+
+        <!-- CAMADA ESCURA AO ABRIR O MENU -->
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- MENU LATERAL (DRAWER) -->
+        <aside id="sidebar-menu" class="sidebar-menu">
+            <div class="sidebar-header">
+                <h3>Opções</h3>
+                <button id="close-menu-btn" class="close-menu-btn" type="button">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="user-info-card">
+                    <span class="user-label">Utilizador:</span>
+                    <span id="user-display-name">Visitante</span>
+                </div>
+
+                <div class="menu-item">
+                    <span>Leitura por Voz</span>
+                    <button id="voice-toggle-btn" type="button">
+                        🔈 Voz: OFF
+                    </button>
+                </div>
+
+                <div class="menu-item logout-section">
+                    <button id="logout-btn" aria-label="Sair da conta" type="button">Sair da Conta</button>
+                </div>
+            </div>
+        </aside>
 
         <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
             <div class="message assistant-message">
@@ -114,6 +140,26 @@
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const voiceToggleBtn = document.getElementById("voice-toggle-btn");
+
+            // Elementos do Menu Lateral
+            const menuBtn = document.getElementById("menu-btn");
+            const closeMenuBtn = document.getElementById("close-menu-btn");
+            const sidebarMenu = document.getElementById("sidebar-menu");
+            const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+            function toggleSidebar(open) {
+                if (open) {
+                    sidebarMenu.classList.add("open");
+                    sidebarOverlay.classList.add("visible");
+                } else {
+                    sidebarMenu.classList.remove("open");
+                    sidebarOverlay.classList.remove("visible");
+                }
+            }
+
+            if (menuBtn) menuBtn.addEventListener("click", () => toggleSidebar(true));
+            if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
+            if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
             let isVoiceEnabled = false;
 
@@ -255,4 +301,3 @@
     </script>
 </body>
 </html>
-
