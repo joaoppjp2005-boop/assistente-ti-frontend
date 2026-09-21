@@ -1,9 +1,165 @@
-/* --- ENVIAR MENSAGEM E RECEBER RESPOSTA DA IA --- */
+<script>
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
+        const BACKEND_URL = "/api/chat";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const splashScreen = document.getElementById("splash-screen");
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const sendBtn = document.getElementById("send-btn");
+
+            // Elementos de Autenticação / Perfil
+            const authModal = document.getElementById("auth-modal");
+            const topLoginBtn = document.getElementById("top-login-btn");
+            const authActionBtn = document.getElementById("auth-action-btn");
+            const authActionText = document.getElementById("auth-action-text");
+            const userProfileCard = document.getElementById("user-profile-card");
+            const userProfileName = document.getElementById("user-profile-name");
+            const userProfileEmail = document.getElementById("user-profile-email");
+            const userAvatar = document.getElementById("user-avatar");
+            const authError = document.getElementById("auth-error");
+
+            // Elementos de Configurações
+            const settingsBtn = document.getElementById("settings-btn");
+            const settingsModal = document.getElementById("settings-modal");
+            const closeSettingsBtn = document.getElementById("close-settings-btn");
+            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
+
+            /* --- CONFIGURAÇÕES --- */
+            function openSettings() {
+                toggleSidebar(false);
+                if (settingsModal) settingsModal.classList.remove("hidden");
+            }
+
+            function closeSettings() {
+                if (settingsModal) settingsModal.classList.add("hidden");
+            }
+
+            if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
+            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
+            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", closeSettings);
+
+            /* --- AUTENTICAÇÃO --- */
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const name = user.displayName || user.email.split('@')[0];
+                    userProfileName.textContent = name;
+                    userProfileEmail.textContent = user.email;
+                    userAvatar.textContent = name.charAt(0).toUpperCase();
+
+                    userProfileCard.classList.remove("hidden");
+                    authActionText.textContent = "Sair";
+                    if (topLoginBtn) topLoginBtn.style.display = "none";
+                } else {
+                    userProfileCard.classList.add("hidden");
+                    authActionText.textContent = "Fazer Login";
+                    if (topLoginBtn) topLoginBtn.style.display = "block";
+                }
+            });
+
+            function handleAuthClick() {
+                if (auth.currentUser) {
+                    auth.signOut();
+                } else {
+                    toggleSidebar(false);
+                    authModal.classList.remove("hidden");
+                }
+            }
+
+            if (topLoginBtn) topLoginBtn.addEventListener("click", handleAuthClick);
+            if (authActionBtn) authActionBtn.addEventListener("click", handleAuthClick);
+
+            document.getElementById("login-btn").addEventListener("click", async () => {
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao entrar: " + err.message;
+                }
+            });
+
+            document.getElementById("register-btn").addEventListener("click", async () => {
+                const name = document.getElementById("auth-name").value;
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    if (name) {
+                        await userCredential.user.updateProfile({ displayName: name });
+                    }
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao cadastrar: " + err.message;
+                }
+            });
+
+            document.getElementById("google-login-btn").addEventListener("click", async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro no Google Login: " + err.message;
+                }
+            });
+
+            document.getElementById("close-modal-btn").addEventListener("click", () => authModal.classList.add("hidden"));
+            document.getElementById("close-modal-overlay").addEventListener("click", () => authModal.classList.add("hidden"));
+
+            /* --- SPLASH SCREEN --- */
+            setTimeout(() => {
+                splashScreen.classList.add("fade-out");
+                setTimeout(() => {
+                    splashScreen.style.display = "none";
+                    if (userInput) userInput.focus();
+                }, 600);
+            }, 1000); // Reduzido para testar mais rápido
+
+            /* --- MENU LATERAL --- */
+            const menuBtn = document.getElementById("menu-btn");
+            const closeMenuBtn = document.getElementById("close-menu-btn");
+            const sidebarMenu = document.getElementById("sidebar-menu");
+            const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+            function toggleSidebar(open) {
+                if (open) {
+                    sidebarMenu.classList.add("open");
+                    sidebarOverlay.classList.add("visible");
+                } else {
+                    sidebarMenu.classList.remove("open");
+                    sidebarOverlay.classList.remove("visible");
+                }
+            }
+
+            if (menuBtn) menuBtn.addEventListener("click", () => toggleSidebar(true));
+            if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
+            if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
+
+            /* --- ENVIAR MENSAGEM (COM TRATAMENTO DE ERRO VISUAL) --- */
             async function sendMessage() {
                 const messageText = userInput.value.trim();
                 if (!messageText) return;
 
-                // 1. Mostra a mensagem do utilizador no chat
+                // 1. Mostra a mensagem do utilizador
                 const userMsgDiv = document.createElement("div");
                 userMsgDiv.classList.add("message", "user-message");
                 userMsgDiv.innerHTML = `<div class="message-header">Você</div>${messageText}`;
@@ -12,26 +168,29 @@
                 userInput.value = "";
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // 2. Cria o balão de "a carregar" da IA
+                // 2. Cria balão de resposta da IA
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
                 aiMsgDiv.innerHTML = `
                     <div class="message-header">CHRONICAL</div>
-                    <div class="markdown-content">
-                        <span style="opacity: 0.6;">A pensar...</span>
-                    </div>`;
+                    <div class="markdown-content">A contactar o servidor...</div>`;
                 chatBox.appendChild(aiMsgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
                 const contentSpan = aiMsgDiv.querySelector(".markdown-content");
 
                 try {
-                    // 3. Envia o pedido para a API do backend
                     const response = await fetch(BACKEND_URL, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ message: messageText })
                     });
+
+                    // Se a rota /api/chat não existir no Vercel, o fetch retorna erro HTML em vez de JSON
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        throw new Error("A rota do backend (/api/chat) não foi encontrada ou retornou HTML.");
+                    }
 
                     const data = await response.json();
 
@@ -40,12 +199,30 @@
                         return;
                     }
 
-                    // 4. Exibe a resposta da IA formatada
                     const responseText = data.text || "Sem resposta.";
                     contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(responseText) : responseText;
                     chatBox.scrollTop = chatBox.scrollHeight;
 
                 } catch (error) {
-                    contentSpan.innerHTML = `<span style="color:#f85149;">Erro de conexão ao servidor.</span>`;
+                    contentSpan.innerHTML = `<span style="color:#f85149;">Erro: ${error.message}</span>`;
+                    console.error("Erro no chat:", error);
                 }
             }
+
+            if (sendBtn) {
+                sendBtn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    sendMessage();
+                });
+            }
+
+            if (userInput) {
+                userInput.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+            }
+        });
+    </script>
