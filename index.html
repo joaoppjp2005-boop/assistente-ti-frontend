@@ -48,7 +48,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURAÇÕES COM NAVEGAÇÃO DE ABAS -->
+    <!-- MODAL DE CONFIGURAÇÕES (MELHORADO) -->
     <div id="settings-modal" class="settings-modal hidden">
         <div class="settings-modal-overlay" id="close-settings-overlay"></div>
         <div class="settings-box">
@@ -58,10 +58,9 @@
             </div>
             
             <div class="settings-body">
-                <!-- Menu de Abas -->
+                <!-- Navegação de Abas -->
                 <nav class="settings-tabs">
                     <button class="tab-btn active" data-tab="tab-general">Geral</button>
-                    <button class="tab-btn" data-tab="tab-account">Conta</button>
                 </nav>
 
                 <!-- Conteúdo da Aba Geral -->
@@ -75,16 +74,6 @@
                             <input type="checkbox" id="auto-read-toggle">
                             <span class="slider"></span>
                         </label>
-                    </div>
-                </div>
-
-                <!-- Conteúdo da Aba Conta -->
-                <div class="tab-content hidden" id="tab-account">
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <span class="setting-title">Perfil do Utilizador</span>
-                            <span class="setting-desc" id="settings-user-email">Faça login para ver os detalhes da conta.</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -230,9 +219,8 @@
             const settingsModal = document.getElementById("settings-modal");
             const closeSettingsBtn = document.getElementById("close-settings-btn");
             const closeSettingsOverlay = document.getElementById("close-settings-overlay");
-            const settingsUserEmail = document.getElementById("settings-user-email");
 
-            /* --- LÓGICA DAS CONFIGURAÇÕES E ABAS --- */
+            /* --- LÓGICA DAS CONFIGURAÇÕES --- */
             function openSettings() {
                 toggleSidebar(false);
                 if (settingsModal) settingsModal.classList.remove("hidden");
@@ -246,25 +234,6 @@
             if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
             if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", closeSettings);
 
-            // Troca de Abas
-            const tabBtns = document.querySelectorAll(".tab-btn");
-            const tabContents = document.querySelectorAll(".tab-content");
-
-            tabBtns.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    const targetTab = btn.getAttribute("data-tab");
-
-                    tabBtns.forEach(b => b.classList.remove("active"));
-                    tabContents.forEach(c => c.classList.add("hidden"));
-
-                    btn.classList.add("active");
-                    const targetElement = document.getElementById(targetTab);
-                    if (targetElement) {
-                        targetElement.classList.remove("hidden");
-                    }
-                });
-            });
-
             /* --- ESTADO DE AUTENTICAÇÃO E PERFIL --- */
             auth.onAuthStateChanged((user) => {
                 if (user) {
@@ -273,10 +242,6 @@
                     userProfileEmail.textContent = user.email;
                     userAvatar.textContent = name.charAt(0).toUpperCase();
 
-                    if (settingsUserEmail) {
-                        settingsUserEmail.textContent = `Sessão iniciada como: ${user.email}`;
-                    }
-
                     userProfileCard.classList.remove("hidden");
                     authActionText.textContent = "Sair";
                     if (topLoginBtn) topLoginBtn.style.display = "none";
@@ -284,9 +249,6 @@
                     userProfileCard.classList.add("hidden");
                     authActionText.textContent = "Fazer Login";
                     if (topLoginBtn) topLoginBtn.style.display = "block";
-                    if (settingsUserEmail) {
-                        settingsUserEmail.textContent = "Faça login para ver os detalhes da conta.";
-                    }
                 }
             });
 
