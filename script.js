@@ -1,10 +1,10 @@
-// 1. Importa os serviços necessários do SDK do Firebase (Web CDN)
+// 1. Importa os serviços do Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// 2. Configuração do Firebase do seu projeto (Chronical)
+// 2. Configuração do Firebase para o projeto Chronical
 const firebaseConfig = {
-  apiKey: "COLE_AQUI_A_SUA_NOVA_CHAVE_DE_API", // <-- Cole aqui a nova chave de API gerada no Google Cloud
+  apiKey: "AIzaSyCAbWdM9bvpVH8od0Ls0nipAcjMmrKDP8M",
   authDomain: "chronical-624a2.firebaseapp.com",
   projectId: "chronical-624a2",
   storageBucket: "chronical-624a2.firebasestorage.app",
@@ -13,28 +13,25 @@ const firebaseConfig = {
   measurementId: "G-KP1PZPM94N"
 };
 
-// 3. Inicializa o Firebase e a Autenticação
+// 3. Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// 4. Função principal de Login com o Google
+// 4. Função para realizar o login com a janela do Google
 export function fazerLoginComGoogle() {
   signInWithPopup(auth, provider)
     .then((result) => {
-      // Login efetuado com sucesso!
-      const user = result.user;
-      console.log("Usuário conectado:", user);
-      alert(`Bem-vindo(a), ${user.displayName}!`);
+      console.log("Login efetuado com sucesso:", result.user);
+      alert(`Bem-vindo(a), ${result.user.displayName}!`);
     })
     .catch((error) => {
-      // Captura erros de autenticação
-      console.error("Erro no login:", error.code, error.message);
+      console.error("Erro no login:", error);
       alert("Falha no login com o Google: " + error.message);
     });
 }
 
-// 5. Opcional: Adiciona o listener no botão assim que a página carrega
+// 5. Conecta a função ao botão "Entrar com o Google" (id="btn-google")
 document.addEventListener("DOMContentLoaded", () => {
   const btnGoogle = document.getElementById("btn-google");
   if (btnGoogle) {
