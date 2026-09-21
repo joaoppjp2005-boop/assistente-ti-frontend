@@ -29,7 +29,7 @@
             <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
 
             <div class="auth-buttons">
-                <button id="login-btn" type="button">Entrar</button>
+                <button id="login-btn" class="btn-green" type="button">Entrar</button>
                 <button id="register-btn" class="secondary-btn" type="button">Cadastrar</button>
             </div>
 
@@ -40,7 +40,8 @@
 
     <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container hidden" role="main">
-        <!-- Botão Flutuante de 3 Barrinhas -->
+        
+        <!-- Botão Flutuante de 3 Barrinhas (Sem Barra de Cabeçalho) -->
         <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
             <span></span>
             <span></span>
@@ -49,7 +50,7 @@
 
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-        <!-- Sidebar / Histórico de Conversas -->
+        <!-- Sidebar / Menu Lateral -->
         <aside id="sidebar-menu" class="sidebar-menu">
             <div class="sidebar-header">
                 <h3>Menu</h3>
@@ -60,28 +61,13 @@
                 <button id="new-chat-btn" class="new-chat-btn" type="button">+ Novo Chat</button>
 
                 <div class="history-section">
-                    <span class="section-label">Histórico de Conversas</span>
-                    <div id="history-list" class="history-list">
-                        <!-- Itens do histórico inseridos via JS -->
-                    </div>
+                    <span class="section-label">Histórico</span>
+                    <div id="history-list" class="history-list"></div>
                 </div>
 
                 <div class="user-info-card">
                     <span class="user-label">Usuário</span>
                     <span id="user-display-name">Visitante</span>
-                </div>
-
-                <div class="menu-item">
-                    <span>Enviar Áudio como:</span>
-                    <select id="audio-mode-select" class="select-input">
-                        <option value="text">Texto (Transcrição)</option>
-                        <option value="voice">Áudio Gravado</option>
-                    </select>
-                </div>
-
-                <div class="menu-item">
-                    <span>Leitura por Voz</span>
-                    <button id="voice-toggle-btn" type="button">🔈 OFF</button>
                 </div>
 
                 <div class="logout-section">
@@ -90,22 +76,24 @@
             </div>
         </aside>
 
+        <!-- Área das Mensagens -->
         <main id="chat-box" class="chat-box">
             <div class="message assistant-message">
-                <div class="message-header">Chronical</div>
+                <div class="message-header">CHRONICAL</div>
                 <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
             </div>
         </main>
 
+        <!-- Barra de Entrada de Texto / Áudio -->
         <footer class="input-container">
             <div id="attachment-preview" class="attachment-preview hidden">
                 <span id="attachment-name"></span>
                 <button id="remove-attachment-btn" type="button">&times;</button>
             </div>
 
-            <!-- Estilo de Barra Estilo Gemini -->
-            <div class="gemini-input-wrapper">
-                <label for="file-input" class="gemini-action-btn" title="Adicionar arquivo">
+            <div class="input-wrapper">
+                <!-- Ícone + de Anexo -->
+                <label for="file-input" class="action-btn" title="Adicionar arquivo">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -113,10 +101,10 @@
                 </label>
                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
 
-                <!-- Campo de Texto -->
-                <input type="text" id="user-input" placeholder="Pergunte algo..." autocomplete="off" />
+                <!-- Campo de Texto Padrão -->
+                <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
 
-                <!-- Visualizador/Indicador de Áudio (Onda Sonora) -->
+                <!-- Visualizador de Áudio (Onda Sonora ao Gravar) -->
                 <div id="audio-wave-container" class="audio-wave-container hidden">
                     <span class="wave-bar"></span>
                     <span class="wave-bar"></span>
@@ -128,23 +116,33 @@
                     <span class="wave-bar"></span>
                     <span class="wave-bar"></span>
                     <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
                 </div>
 
-                <!-- Botão Parar / Limpar Gravação -->
-                <button id="stop-audio-btn" type="button" class="gemini-action-btn hidden" title="Cancelar gravação">
-                    <div class="stop-icon"></div>
+                <!-- Botão de Parar Gravação (Quadrado) -->
+                <button id="stop-audio-btn" type="button" class="stop-audio-btn hidden" title="Cancelar gravação">
+                    <div class="stop-square"></div>
                 </button>
 
                 <!-- Botão do Microfone -->
-                <button id="mic-btn" type="button" class="gemini-action-btn" title="Falar">
+                <button id="mic-btn" type="button" class="action-btn" title="Falar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.53 16.39 17.44 13 17.93V20H17V22H7V20H11V17.93C7.61 17.44 5 14.53 5 11H7C7 13.76 9.24 16 12 16C14.76 16 17 13.76 17 11H19Z"/>
                     </svg>
                 </button>
                 
-                <!-- Botão de Enviar Azul -->
-                <button id="send-btn" class="gemini-send-btn" aria-label="Enviar" type="button">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Botão Enviar Padrão (Verde) -->
+                <button id="send-btn" class="send-btn-green" aria-label="Enviar" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+
+                <!-- Botão Enviar Áudio (Azul com seta para cima) -->
+                <button id="send-audio-btn" class="send-btn-blue hidden" aria-label="Enviar Áudio" type="button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="19" x2="12" y2="5"></line>
                         <polyline points="5 12 12 5 19 12"></polyline>
                     </svg>
@@ -167,6 +165,7 @@
             const chatBox = document.getElementById("chat-box");
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
+            const sendAudioBtn = document.getElementById("send-audio-btn");
             const fileInput = document.getElementById("file-input");
             const attachmentPreview = document.getElementById("attachment-preview");
             const attachmentName = document.getElementById("attachment-name");
@@ -174,88 +173,10 @@
             const micBtn = document.getElementById("mic-btn");
             const stopAudioBtn = document.getElementById("stop-audio-btn");
             const audioWaveContainer = document.getElementById("audio-wave-container");
-            const historyList = document.getElementById("history-list");
-            const newChatBtn = document.getElementById("new-chat-btn");
 
             let currentFile = null;
-            let currentChatId = Date.now().toString();
-            let chatsHistory = JSON.parse(localStorage.getItem("chronical_chats")) || {};
 
-            /* Gerenciar Histórico de Conversas */
-            function saveCurrentChat(firstUserMsg) {
-                if (!chatsHistory[currentChatId]) {
-                    chatsHistory[currentChatId] = {
-                        title: firstUserMsg.length > 25 ? firstUserMsg.substring(0, 25) + "..." : firstUserMsg,
-                        messages: []
-                    };
-                }
-                localStorage.setItem("chronical_chats", JSON.stringify(chatsHistory));
-                renderHistoryList();
-            }
-
-            function renderHistoryList() {
-                historyList.innerHTML = "";
-                const keys = Object.keys(chatsHistory).reverse();
-                
-                if (keys.length === 0) {
-                    historyList.innerHTML = `<span class="empty-history">Nenhuma conversa salva</span>`;
-                    return;
-                }
-
-                keys.forEach(id => {
-                    const item = document.createElement("div");
-                    item.classList.add("history-item");
-                    if (id === currentChatId) item.classList.add("active");
-                    item.textContent = chatsHistory[id].title || "Conversa";
-
-                    item.addEventListener("click", () => {
-                        currentChatId = id;
-                        loadChat(id);
-                        toggleSidebar(false);
-                    });
-
-                    historyList.appendChild(item);
-                });
-            }
-
-            function loadChat(id) {
-                chatBox.innerHTML = "";
-                const chat = chatsHistory[id];
-                if (chat && chat.messages) {
-                    chat.messages.forEach(m => {
-                        appendMessageUI(m.sender, m.text, m.type, m.fileName);
-                    });
-                } else {
-                    appendMessageUI("Chronical", "Olá! Sou a Chronical. Como posso ajudar você hoje?", "ia");
-                }
-                renderHistoryList();
-            }
-
-            newChatBtn.addEventListener("click", () => {
-                currentChatId = Date.now().toString();
-                chatBox.innerHTML = "";
-                appendMessageUI("Chronical", "Olá! Sou a Chronical. Como posso ajudar você hoje?", "ia");
-                renderHistoryList();
-                toggleSidebar(false);
-            });
-
-            /* Anexos */
-            fileInput.addEventListener("change", (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    currentFile = file;
-                    attachmentName.textContent = `📄 ${file.name}`;
-                    attachmentPreview.classList.remove("hidden");
-                }
-            });
-
-            removeAttachmentBtn.addEventListener("click", () => {
-                currentFile = null;
-                fileInput.value = "";
-                attachmentPreview.classList.add("hidden");
-            });
-
-            /* Microfone e Interface de Áudio (Gemini Style) */
+            /* Gerenciamento do Modo de Gravação de Áudio */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             let recognition = null;
             let isListeningSpeech = false;
@@ -268,10 +189,14 @@
 
                 recognition.onstart = () => {
                     isListeningSpeech = true;
+                    // Alterna para a barra de áudio
                     userInput.classList.add("hidden");
                     micBtn.classList.add("hidden");
+                    sendBtn.classList.add("hidden");
+
                     audioWaveContainer.classList.remove("hidden");
                     stopAudioBtn.classList.remove("hidden");
+                    sendAudioBtn.classList.remove("hidden");
                 };
 
                 recognition.onresult = (event) => {
@@ -283,7 +208,9 @@
                 };
 
                 recognition.onerror = recognition.onend = () => {
-                    resetAudioUI();
+                    if (!userInput.value.trim()) {
+                        resetAudioUI();
+                    }
                 };
             }
 
@@ -291,8 +218,11 @@
                 isListeningSpeech = false;
                 userInput.classList.remove("hidden");
                 micBtn.classList.remove("hidden");
+                sendBtn.classList.remove("hidden");
+
                 audioWaveContainer.classList.add("hidden");
                 stopAudioBtn.classList.add("hidden");
+                sendAudioBtn.classList.add("hidden");
             }
 
             micBtn.addEventListener("click", () => {
@@ -304,10 +234,14 @@
             });
 
             stopAudioBtn.addEventListener("click", () => {
-                if (recognition && isListeningSpeech) {
-                    recognition.stop();
-                }
+                if (recognition && isListeningSpeech) recognition.stop();
+                userInput.value = "";
                 resetAudioUI();
+            });
+
+            sendAudioBtn.addEventListener("click", () => {
+                if (recognition && isListeningSpeech) recognition.stop();
+                sendMessage();
             });
 
             /* Menu Lateral */
@@ -330,17 +264,15 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            function appendMessageUI(sender, text, type, fileName = null) {
+            function appendMessageUI(sender, text, type) {
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
-                
-                let fileTag = fileName ? `<div class="file-tag">📄 ${fileName}</div>` : '';
                 let header = `<div class="message-header">${sender}</div>`;
 
                 if (type === "ia" && typeof marked !== "undefined") {
-                    msgDiv.innerHTML = `${header}${fileTag}<div class="markdown-content">${marked.parse(text)}</div>`;
+                    msgDiv.innerHTML = `${header}<div class="markdown-content">${marked.parse(text)}</div>`;
                 } else {
-                    msgDiv.innerHTML = `${header}${fileTag}${text}`;
+                    msgDiv.innerHTML = `${header}${text}`;
                 }
                 chatBox.appendChild(msgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -348,26 +280,18 @@
             }
 
             async function sendMessage() {
-                if (recognition && isListeningSpeech) recognition.stop();
-                resetAudioUI();
-
                 const messageText = userInput.value.trim();
                 if (!messageText && !currentFile) return;
 
-                const fileAttachedName = currentFile ? currentFile.name : null;
-
-                appendMessageUI("Você", messageText || "(Arquivo enviado)", "user", fileAttachedName);
-                saveCurrentChat(messageText || "Arquivo enviado");
+                appendMessageUI("Você", messageText || "(Arquivo enviado)", "user");
 
                 userInput.value = "";
-                currentFile = null;
-                fileInput.value = "";
-                attachmentPreview.classList.add("hidden");
+                resetAudioUI();
 
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
                 aiMsgDiv.innerHTML = `
-                    <div class="message-header">Chronical</div>
+                    <div class="message-header">CHRONICAL</div>
                     <div class="markdown-content">
                         <div class="typing-dots"><span></span><span></span><span></span></div>
                     </div>`;
@@ -386,21 +310,11 @@
                     const data = await response.json();
 
                     if (!response.ok) {
-                        contentSpan.innerHTML = `<span style="color:#f85149;">${data.error || "Ocorreu um erro no servidor."}</span>`;
+                        contentSpan.innerHTML = `<span style="color:#f85149;">${data.error || "Erro no servidor."}</span>`;
                         return;
                     }
 
-                    if (data.text) {
-                        contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
-                        
-                        if (!chatsHistory[currentChatId]) chatsHistory[currentChatId] = { title: messageText.substring(0,25), messages: [] };
-                        chatsHistory[currentChatId].messages.push({ sender: "Você", text: messageText, type: "user" });
-                        chatsHistory[currentChatId].messages.push({ sender: "Chronical", text: data.text, type: "ia" });
-                        localStorage.setItem("chronical_chats", JSON.stringify(chatsHistory));
-
-                    } else {
-                        contentSpan.innerHTML = "Resposta vazia da IA.";
-                    }
+                    contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
                     chatBox.scrollTop = chatBox.scrollHeight;
 
                 } catch (error) {
@@ -414,9 +328,8 @@
                     if (e.key === "Enter") sendMessage();
                 });
             }
-
-            renderHistoryList();
         });
     </script>
 </body>
 </html>
+
