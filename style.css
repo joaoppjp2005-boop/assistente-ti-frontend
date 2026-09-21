@@ -19,14 +19,79 @@ body {
 
 .hidden { display: none !important; }
 
-/* TELA DE AUTH / LOGIN */
-.auth-container {
-    width: 100%;
-    max-width: 400px;
+/* CABEÇALHO SUPERIOR ( BARRINHAS + BOTÃO ENTRAR ) */
+.top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 16px;
+    z-index: 10;
+}
+
+.floating-menu-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.floating-menu-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background-color: #f0f6fc;
+    border-radius: 2px;
+}
+
+.top-login-btn {
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.top-login-btn:hover {
+    background: #166534;
+}
+
+/* MODAL DE LOGIN FLUTUANTE */
+.auth-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 20px;
 }
 
+.auth-modal-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(5px);
+}
+
 .auth-box {
+    position: relative;
+    z-index: 201;
+    width: 100%;
+    max-width: 380px;
     background: #0d1117;
     border: 1px solid #1f242c;
     border-radius: 16px;
@@ -34,17 +99,27 @@ body {
     text-align: center;
 }
 
+.close-modal-x {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: #8b949e;
+    font-size: 22px;
+    cursor: pointer;
+}
+
 .auth-box h2 { font-size: 22px; color: #f0f6fc; margin-bottom: 6px; }
 .auth-box p { font-size: 13px; color: #8b949e; margin-bottom: 20px; }
 
-/* 1. ÍCONE DO GOOGLE REDUZIDO */
 .google-btn {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 14px;
+    padding: 12px;
     background-color: #2d3139;
     color: #ffffff;
     border: none;
@@ -60,7 +135,7 @@ body {
     object-fit: contain;
 }
 
-.divider { display: flex; align-items: center; color: #484f58; font-size: 12px; margin: 18px 0; }
+.divider { display: flex; align-items: center; color: #484f58; font-size: 12px; margin: 16px 0; }
 .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #21262d; }
 .divider::before { margin-right: 12px; }
 .divider::after { margin-left: 12px; }
@@ -76,11 +151,10 @@ body {
     font-size: 14px;
 }
 
-.auth-buttons { display: flex; gap: 10px; margin-bottom: 10px; }
+.auth-buttons { display: flex; gap: 10px; }
 .auth-buttons button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; }
 .btn-green { background: #15803d; color: #ffffff; }
 .secondary-btn { background: #21262d; color: #c9d1d9; }
-.guest-btn { width: 100%; padding: 12px; background: transparent; border: 1px solid #21262d; color: #8b949e; border-radius: 10px; cursor: pointer; }
 
 /* CHAT CONTAINER */
 .chat-container {
@@ -93,27 +167,32 @@ body {
     position: relative;
 }
 
-/* 2. APENAS AS 3 BARRINHAS FLUTUANTES (SEM HEADER) */
-.floating-menu-btn {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    z-index: 10;
-    background: transparent;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+/* ANIMAÇÃO DE BEM-VINDO AO ENTRAR */
+.welcome-banner {
+    text-align: center;
+    margin: 20px 0 10px 0;
+    animation: fadeInDown 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.floating-menu-btn span {
-    display: block;
-    width: 20px;
-    height: 2px;
-    background-color: #f0f6fc;
-    border-radius: 2px;
+.welcome-text {
+    font-size: 20px;
+    font-weight: 600;
+    color: #8b949e;
+}
+
+.welcome-text .highlight {
+    color: #22c55e;
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* SIDEBAR E OVERLAY */
@@ -162,7 +241,7 @@ body {
 /* ÁREA DE CHAT */
 .chat-box {
     flex: 1;
-    padding: 50px 16px 16px 16px;
+    padding: 60px 16px 16px 16px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -257,7 +336,7 @@ body {
     flex-shrink: 0;
 }
 
-/* 3. SISTEMA DE BARRINHAS DE ÁUDIO IGUAL À FOTO */
+/* SISTEMA DE BARRINHAS DE ÁUDIO */
 .audio-wave-container {
     flex: 1;
     display: flex;
@@ -325,4 +404,3 @@ body {
     cursor: pointer;
     flex-shrink: 0;
 }
-
