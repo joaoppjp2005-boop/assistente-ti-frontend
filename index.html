@@ -1,248 +1,31 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chronical I.A</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-    }
+<!-- MODAL DE CONFIGURAÇÕES -->
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="settings-modal-overlay" id="close-settings-overlay"></div>
+        <div class="settings-box">
+            <div class="settings-header">
+                <h2>Configurações</h2>
+                <button id="close-settings-btn" class="close-modal-x">&times;</button>
+            </div>
+            
+            <div class="settings-body">
+                <!-- Navegação apenas com a aba Geral -->
+                <nav class="settings-tabs">
+                    <button class="tab-btn active" data-tab="tab-general">Geral</button>
+                </nav>
 
-    body {
-      background-color: #0b0f19;
-      color: #e2e8f0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    /* Animação de Boas-Vindas Splash Screen */
-    #splash-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #0b0f19;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      animation: fadeOut 0.8s ease-in-out 2.5s forwards;
-    }
-
-    .welcome-text {
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: #22c55e;
-      text-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
-      animation: pulseGlow 2s infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      0% { transform: scale(0.98); opacity: 0.8; }
-      100% { transform: scale(1.02); opacity: 1; text-shadow: 0 0 30px rgba(34, 197, 94, 0.8); }
-    }
-
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
-    }
-
-    /* Tela de Autenticação / Login Overlay */
-    #auth-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(11, 15, 25, 0.95);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .login-box {
-      background: #161e2e;
-      border: 1px solid #22c55e;
-      border-radius: 16px;
-      padding: 2.5rem;
-      width: 90%;
-      max-width: 400px;
-      text-align: center;
-      box-shadow: 0 0 25px rgba(34, 197, 94, 0.2);
-    }
-
-    .login-box h2 {
-      color: #22c55e;
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .login-box p {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      margin-bottom: 1.8rem;
-    }
-
-    .btn-google {
-      width: 100%;
-      padding: 12px;
-      background: #ffffff;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .btn-google:hover {
-      background: #e2e8f0;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-    }
-
-    .btn-green {
-      background-color: #22c55e;
-      color: #000;
-      font-weight: 600;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      width: 100%;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .btn-green:hover {
-      background-color: #16a34a;
-      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
-    }
-
-    /* Container Principal do Chat */
-    .app-main {
-      display: flex;
-      flex: 1;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    /* Sidebar / Menu Lateral */
-    .sidebar {
-      width: 260px;
-      background: #111827;
-      border-right: 1px solid #1f2937;
-      display: flex;
-      flex-direction: column;
-      padding: 1rem;
-    }
-
-    .sidebar-header {
-      color: #22c55e;
-      font-weight: bold;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-    }
-
-    .history-list {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    /* Área do Chat */
-    .chat-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #0b0f19;
-    }
-
-    .messages-container {
-      flex: 1;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-
-    .input-bar {
-      padding: 1rem 2rem;
-      background: #111827;
-      border-top: 1px solid #1f2937;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .input-bar input {
-      flex: 1;
-      background: #1f2937;
-      border: 1px solid #374151;
-      border-radius: 8px;
-      padding: 12px;
-      color: #fff;
-      outline: none;
-    }
-
-    .input-bar input:focus {
-      border-color: #22c55e;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Tela de Boas-Vindas (Animação Verde) -->
-  <div id="splash-screen">
-    <h1 class="welcome-text">Bem-vindo à Chronical I.A</h1>
-  </div>
-
-  <!-- Modal de Login -->
-  <div id="auth-container">
-    <div class="login-box">
-      <h2>Chronical I.A</h2>
-      <p>Acesse para utilizar o assistente</p>
-
-      <button type="button" id="btn-google" class="btn-google">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
-        <span>Entrar com o Google</span>
-      </button>
+                <!-- Conteúdo da Aba Geral -->
+                <div class="tab-content active" id="tab-general">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">Leitura automática</span>
+                            <span class="setting-desc">Lê automaticamente as respostas da IA</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-read-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-
-  <!-- Aplicação Principal (Chat & Interface) -->
-  <div class="app-main">
-    <aside class="sidebar">
-      <div class="sidebar-header">Chronical I.A</div>
-      <div class="history-list">
-        <!-- Histórico de conversas -->
-      </div>
-    </aside>
-
-    <main class="chat-area">
-      <div class="messages-container" id="messages">
-        <!-- Mensagens do chat aparecem aqui -->
-      </div>
-
-      <div class="input-bar">
-        <input type="text" placeholder="Digite sua mensagem..." id="chat-input">
-        <button class="btn-green" style="width: auto; padding: 12px 24px;">Enviar</button>
-      </div>
-    </main>
-  </div>
-
-  <script type="module" src="script.js"></script>
-</body>
-</html>
