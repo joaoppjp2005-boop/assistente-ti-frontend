@@ -3,16 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById('send-btn');
   const messagesContainer = document.getElementById('messages');
 
-  // A sua chave de API integrada
   const API_KEY = "AQ.Ab8RN6JKq5NGLonsW3GT6GcB_EX4aSuy64YGtWDl-_uD47z7gA";
-
-  console.log("Chronical I.A inicializado com sucesso!");
 
   async function enviarMensagem() {
     const texto = chatInput.value.trim();
     if (!texto) return;
 
-    // 1. Mostra a mensagem do utilizador no chat
+    // 1. Mostra a mensagem do utilizador
     const userMsg = document.createElement('div');
     userMsg.className = 'message user';
     userMsg.textContent = texto;
@@ -21,39 +18,40 @@ document.addEventListener("DOMContentLoaded", () => {
     chatInput.value = '';
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-    // 2. Balão de carregamento da IA
+    // 2. Balão de "A pensar..."
     const aiMsg = document.createElement('div');
     aiMsg.className = 'message ai';
-    aiMsg.textContent = "A consultar o Gemini...";
+    aiMsg.textContent = "A contactar o Gemini...";
     messagesContainer.appendChild(aiMsg);
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
     try {
-      // 3. Chamada direta para a API do Google Gemini
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+      const resposta = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{ text: texto }]
-          }]
+          contents: [
+            {
+              parts: [{ text: texto }]
+            }
+          ]
         })
       });
 
-      const data = await response.json();
-      
-      if (data.candidates && data.candidates[0].content.parts[0].text) {
-        aiMsg.textContent = data.candidates[0].content.parts[0].text;
-      } else if (data.error) {
-        aiMsg.textContent = "Erro da API: " + (data.error.message || "Chave inválida ou erro no pedido.");
+      const dados = await resposta.json();
+
+      if (dados.candidates && dados.candidates[0].content.parts[0].text) {
+        aiMsg.textContent = dados.candidates[0].content.parts[0].text;
+      } else if (dados.error) {
+        aiMsg.textContent = "Erro da API: " + dados.error.message;
       } else {
-        aiMsg.textContent = "A IA não retornou nenhuma resposta.";
+        aiMsg.textContent = "Resposta vazia recebida da IA.";
       }
-    } catch (error) {
-      console.error("Erro:", error);
-      aiMsg.textContent = "Ocorreu um erro de ligação com a API.";
+    } catch (erro) {
+      console.error("Erro na requisição:", erro);
+      aiMsg.textContent = "Erro de conexão ao tentar falar com a IA.";
     }
 
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
