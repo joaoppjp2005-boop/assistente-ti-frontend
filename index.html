@@ -12,7 +12,15 @@
 </head>
 <body>
 
-    <!-- MODAL DE LOGIN (Abre apenas ao clicar no botão "Entrar" no topo) -->
+    <!-- TELA DE ABERTURA (SPLASH SCREEN COM ANIMAÇÃO NO CENTRO) -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">Bem-vindo à <span class="highlight">Chronical I.A</span></h1>
+            <div class="splash-loader"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN (Abre ao clicar no botão "Entrar") -->
     <div id="auth-modal" class="auth-modal hidden">
         <div class="auth-modal-overlay" id="close-modal-overlay"></div>
         <div class="auth-box">
@@ -39,10 +47,10 @@
         </div>
     </div>
 
-    <!-- TELA DO CHAT (Carregada imediatamente ao entrar) -->
+    <!-- TELA DO CHAT (Carregada no fundo e liberada após a animação) -->
     <div id="chat-container" class="chat-container" role="main">
         
-        <!-- Cabeçalho Transparente: 3 Barrinhas (Esquerda) e Botão Entrar (Direita) -->
+        <!-- Cabeçalho: 3 Barrinhas (Esquerda) e Botão Entrar (Direita) -->
         <header class="top-bar">
             <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
                 <span></span>
@@ -81,21 +89,15 @@
             </div>
         </aside>
 
-        <!-- Área das Mensagens com Animação de Boas-Vindas Instantânea -->
+        <!-- Área de Mensagens -->
         <main id="chat-box" class="chat-box">
-            
-            <!-- Animação de Entrada "Bem-vindo à Chronical I.A" ao carregar -->
-            <div id="welcome-banner" class="welcome-banner">
-                <h1 class="welcome-text">Bem-vindo à <span class="highlight">Chronical I.A</span></h1>
-            </div>
-
             <div class="message assistant-message">
                 <div class="message-header">CHRONICAL</div>
                 <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
             </div>
         </main>
 
-        <!-- Barra de Entrada de Texto / Áudio Pronta para Uso -->
+        <!-- Barra de Entrada de Texto / Áudio -->
         <footer class="input-container">
             <div id="attachment-preview" class="attachment-preview hidden">
                 <span id="attachment-name"></span>
@@ -103,7 +105,6 @@
             </div>
 
             <div class="input-wrapper">
-                <!-- Ícone + de Anexo -->
                 <label for="file-input" class="action-btn" title="Adicionar arquivo">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -112,38 +113,27 @@
                 </label>
                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
 
-                <!-- Campo de Texto Padrão (Focado/Disponível para digitar imediatamente) -->
-                <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" autofocus />
+                <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
 
-                <!-- Visualizador de Áudio (Onda Sonora ao Gravar) -->
                 <div id="audio-wave-container" class="audio-wave-container hidden">
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
-                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
+                    <span class="wave-bar"></span><span class="wave-bar"></span>
                 </div>
 
-                <!-- Botão de Parar Gravação -->
                 <button id="stop-audio-btn" type="button" class="stop-audio-btn hidden" title="Cancelar gravação">
                     <div class="stop-square"></div>
                 </button>
 
-                <!-- Botão do Microfone -->
                 <button id="mic-btn" type="button" class="action-btn" title="Falar">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.53 16.39 17.44 13 17.93V20H17V22H7V20H11V17.93C7.61 17.44 5 14.53 5 11H7C7 13.76 9.24 16 12 16C14.76 16 17 13.76 17 11H19Z"/>
                     </svg>
                 </button>
                 
-                <!-- Botão Enviar Padrão (Verde) -->
                 <button id="send-btn" class="send-btn-green" aria-label="Enviar" type="button">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -151,7 +141,6 @@
                     </svg>
                 </button>
 
-                <!-- Botão Enviar Áudio -->
                 <button id="send-audio-btn" class="send-btn-blue hidden" aria-label="Enviar Áudio" type="button">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="19" x2="12" y2="5"></line>
@@ -166,18 +155,25 @@
         const BACKEND_URL = "/api/chat";
 
         document.addEventListener("DOMContentLoaded", () => {
-            const chatBox = document.getElementById("chat-box");
+            const splashScreen = document.getElementById("splash-screen");
             const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
             const sendBtn = document.getElementById("send-btn");
             const sendAudioBtn = document.getElementById("send-audio-btn");
             const micBtn = document.getElementById("mic-btn");
             const stopAudioBtn = document.getElementById("stop-audio-btn");
             const audioWaveContainer = document.getElementById("audio-wave-container");
 
-            /* Coloca foco no campo de texto imediatamente */
-            if (userInput) userInput.focus();
+            /* TEMPO DA ANIMAÇÃO DE ENTRADA (2.2 segundos) */
+            setTimeout(() => {
+                splashScreen.classList.add("fade-out");
+                setTimeout(() => {
+                    splashScreen.style.display = "none";
+                    if (userInput) userInput.focus(); // Foca no campo para digitar
+                }, 600);
+            }, 2200);
 
-            /* Controle do Modal de Login */
+            /* Modal de Login */
             const topLoginBtn = document.getElementById("top-login-btn");
             const authModal = document.getElementById("auth-modal");
             const closeModalBtn = document.getElementById("close-modal-btn");
@@ -187,7 +183,7 @@
             if (closeModalBtn) closeModalBtn.addEventListener("click", () => authModal.classList.add("hidden"));
             if (closeModalOverlay) closeModalOverlay.addEventListener("click", () => authModal.classList.add("hidden"));
 
-            /* Gravação de Áudio */
+            /* Reconhecimento de Voz */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             let recognition = null;
             let isListeningSpeech = false;
@@ -203,7 +199,6 @@
                     userInput.classList.add("hidden");
                     micBtn.classList.add("hidden");
                     sendBtn.classList.add("hidden");
-
                     audioWaveContainer.classList.remove("hidden");
                     stopAudioBtn.classList.remove("hidden");
                     sendAudioBtn.classList.remove("hidden");
@@ -218,9 +213,7 @@
                 };
 
                 recognition.onerror = recognition.onend = () => {
-                    if (!userInput.value.trim()) {
-                        resetAudioUI();
-                    }
+                    if (!userInput.value.trim()) resetAudioUI();
                 };
             }
 
@@ -229,7 +222,6 @@
                 userInput.classList.remove("hidden");
                 micBtn.classList.remove("hidden");
                 sendBtn.classList.remove("hidden");
-
                 audioWaveContainer.classList.add("hidden");
                 stopAudioBtn.classList.add("hidden");
                 sendAudioBtn.classList.add("hidden");
@@ -237,11 +229,7 @@
 
             if (micBtn) {
                 micBtn.addEventListener("click", () => {
-                    if (SpeechRecognition) {
-                        if (!isListeningSpeech) recognition.start();
-                    } else {
-                        alert("Reconhecimento de voz não suportado neste navegador.");
-                    }
+                    if (SpeechRecognition && !isListeningSpeech) recognition.start();
                 });
             }
 
@@ -292,7 +280,6 @@
                 }
                 chatBox.appendChild(msgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
-                return msgDiv;
             }
 
             async function sendMessage() {
@@ -300,7 +287,6 @@
                 if (!messageText) return;
 
                 appendMessageUI("Você", messageText, "user");
-
                 userInput.value = "";
                 resetAudioUI();
 
@@ -324,15 +310,12 @@
                     });
 
                     const data = await response.json();
-
                     if (!response.ok) {
                         contentSpan.innerHTML = `<span style="color:#f85149;">${data.error || "Erro no servidor."}</span>`;
                         return;
                     }
-
                     contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
                     chatBox.scrollTop = chatBox.scrollHeight;
-
                 } catch (error) {
                     contentSpan.innerHTML = `<span style="color:#f85149;">Erro de conexão ao servidor.</span>`;
                 }
@@ -348,3 +331,4 @@
     </script>
 </body>
 </html>
+
