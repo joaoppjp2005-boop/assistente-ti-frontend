@@ -19,7 +19,86 @@ body {
 
 .hidden { display: none !important; }
 
-/* CABEÇALHO SUPERIOR ( 3 BARRINHAS + BOTÃO ENTRAR NA RETA ) */
+/* TELA DE ABERTURA EM TELA CHEIA (SPLASH SCREEN) */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-color: #05070a;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.splash-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: zoomIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.splash-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+}
+
+.splash-title .highlight {
+    color: #22c55e;
+    text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+.splash-loader {
+    width: 40px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.splash-loader::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #22c55e;
+    animation: loadingBar 1.8s infinite ease-in-out;
+}
+
+@keyframes zoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes loadingBar {
+    0% { left: -100%; }
+    50% { left: 0%; }
+    100% { left: 100%; }
+}
+
+/* CABEÇALHO SUPERIOR ( BARRINHAS + BOTÃO ENTRAR ) */
 .top-bar {
     position: absolute;
     top: 0;
@@ -60,18 +139,12 @@ body {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: background 0.2s;
 }
 
-.top-login-btn:hover {
-    background: #166534;
-}
+.top-login-btn:hover { background: #166534; }
 
-.top-login-btn:active {
-    transform: scale(0.96);
-}
-
-/* MODAL DE LOGIN (SOMENTE QUANDO CLICA EM ENTRAR) */
+/* MODAL DE LOGIN (SOMENTE AO CLICAR EM ENTRAR) */
 .auth-modal {
     position: fixed;
     top: 0; left: 0;
@@ -105,8 +178,7 @@ body {
 
 .close-modal-x {
     position: absolute;
-    top: 12px;
-    right: 16px;
+    top: 12px; right: 16px;
     background: transparent;
     border: none;
     color: #8b949e;
@@ -133,11 +205,7 @@ body {
     cursor: pointer;
 }
 
-.google-btn img {
-    width: 20px !important;
-    height: 20px !important;
-    object-fit: contain;
-}
+.google-btn img { width: 20px !important; height: 20px !important; object-fit: contain; }
 
 .divider { display: flex; align-items: center; color: #484f58; font-size: 12px; margin: 16px 0; }
 .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #21262d; }
@@ -171,37 +239,6 @@ body {
     position: relative;
 }
 
-/* ANIMAÇÃO DE BEM-VINDO AO ENTRAR (ENTRA SUAVE SEM BLOQUEAR NADA) */
-.welcome-banner {
-    text-align: center;
-    margin: 10px 0 16px 0;
-    pointer-events: none;
-    animation: welcomeEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.welcome-text {
-    font-size: 21px;
-    font-weight: 600;
-    color: #8b949e;
-    letter-spacing: -0.2px;
-}
-
-.welcome-text .highlight {
-    color: #22c55e;
-    text-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
-}
-
-@keyframes welcomeEntrance {
-    0% {
-        opacity: 0;
-        transform: translateY(-16px) scale(0.97);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
-
 /* SIDEBAR E OVERLAY */
 .sidebar-overlay {
     position: fixed;
@@ -218,10 +255,8 @@ body {
 
 .sidebar-menu {
     position: fixed;
-    top: 0;
-    left: -280px;
-    width: 280px;
-    height: 100vh;
+    top: 0; left: -280px;
+    width: 280px; height: 100vh;
     background: #0d1117;
     border-right: 1px solid #1f242c;
     z-index: 100;
@@ -248,7 +283,7 @@ body {
 /* ÁREA DE CHAT */
 .chat-box {
     flex: 1;
-    padding: 60px 16px 16px 16px;
+    padding: 70px 16px 16px 16px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -343,7 +378,7 @@ body {
     flex-shrink: 0;
 }
 
-/* SISTEMA DE BARRINHAS DE ÁUDIO */
+/* BARRINHAS DE ÁUDIO */
 .audio-wave-container {
     flex: 1;
     display: flex;
@@ -393,8 +428,7 @@ body {
 }
 
 .stop-square {
-    width: 14px;
-    height: 14px;
+    width: 14px; height: 14px;
     background-color: #ffffff;
     border-radius: 3px;
 }
@@ -402,8 +436,7 @@ body {
 .send-btn-blue {
     background: #2563eb;
     border: none;
-    width: 38px;
-    height: 38px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -411,4 +444,3 @@ body {
     cursor: pointer;
     flex-shrink: 0;
 }
-
