@@ -1,402 +1,57 @@
-// Credenciais do Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyCAbWdM9bvpVH8od0Ls0nipAcjMmrKDP8M",
-    authDomain: "chronical-624a2.firebaseapp.com",
-    projectId: "chronical-624a2",
-    storageBucket: "chronical-624a2.firebasestorage.app",
-    messagingSenderId: "919413941674",
-    appId: "1:919413941674:web:a2e56297e56f666b44f7d3",
-    measurementId: "G-KP1PZPM94N"
-};
-
-// Inicialização segura
-try {
-    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-} catch (e) {
-    console.error("Erro Firebase:", e);
-}
-
-const BACKEND_URL = "https://assistente-ti-backendd.onrender.com/chat";
-let isGuestMode = false;
-
-// Função direta para entrar como visitante
-function entrarComoVisitante() {
-    isGuestMode = true;
-    const authContainer = document.getElementById("auth-container");
-    const chatContainer = document.getElementById("chat-container");
-    const userDisplayName = document.getElementById("user-display-name");
-
-    if (authContainer) authContainer.classList.add("hidden");
-    if (chatContainer) chatContainer.classList.remove("hidden");
-    if (userDisplayName) userDisplayName.textContent = "Visitante";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const authContainer = document.getElementById("auth-container");
-    const chatContainer = document.getElementById("chat-container");
-    const authEmail = document.getElementById("auth-email");
-    const authPassword = document.getElementById("auth-password");
-    const authError = document.getElementById("auth-error");
-    const userDisplayName = document.getElementById("user-display-name");
-
-    const loginBtn = document.getElementById("login-btn");
-    const registerBtn = document.getElementById("register-btn");
-    const googleLoginBtn = document.getElementById("google-login-btn");
-    const logoutBtn = document.getElementById("logout-btn");
-
-    const chatBox = document.getElementById("chat-box");
-    const userInput = document.getElementById("user-input");
-    const sendBtn = document.getElementById("send-btn");
-
-    // Firebase Auth Observer
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                isGuestMode = false;
-                authContainer.classList.add("hidden");
-                chatContainer.classList.remove("hidden");
-                userDisplayName.textContent = user.displayName || user.email;
-            } else if (!isGuestMode) {
-                authContainer.classList.remove("hidden");
-                chatContainer.classList.add("hidden");
-            }
-        });
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Apenas método POST é permitido' });
     }
 
-    // Handlers de Login
-    if (loginBtn) {
-        loginBtn.addEventListener("click", () => {
-            const email = authEmail.value.trim();
-            const password = authPassword.value.trim();
-            if (!email || !password) {
-                authError.textContent = "Preencha e-mail e senha.";
-                return;
-            }
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .catch(err => authError.textContent = "Erro: " + err.message);
-        });
+    const { message } = req.body || {};
+    if (!message) {
+        return res.status(400).json({ error: 'Mensagem ausente' });
     }
 
-    if (registerBtn) {
-        registerBtn.addEventListener("click", () => {
-            const email = authEmail.value.trim();
-            const password = authPassword.value.trim();
-            if (!email || !password) {
-                authError.textContent = "Preencha e-mail e senha para cadastrar.";
-                return;
-            }
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then(() => alert("Conta criada com sucesso!"))
-                .catch(err => authError.textContent = "Erro: " + err.message);
-        });
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+        return res.status(500).json({ error: 'GEMINI_API_KEY não configurada na Vercel' });
     }
 
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener("click", () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider)
-                .catch(err => authError.textContent = "Erro Google: " + err.message);
-        });
-    }
+    // Lista de modelos ordenada por preferência
+    const models = [
+        'gemini-3.6-flash',
+        'gemini-1.5-flash-8b',
+        'gemini-1.5-pro'
+    ];
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            isGuestMode = false;
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().signOut();
-            }
-            authContainer.classList.remove("hidden");
-            chatContainer.classList.add("hidden");
-        });
-    }
+    let lastError = null;
 
-    // Mensagens do Chat
-    function appendMessage(sender, text, type) {
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("message");
-        msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
-        
-        if (type === "ia" && typeof marked !== "undefined") {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
-        } else {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-        }
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv;
-    }
-
-    async function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (!messageText) return;
-
-        appendMessage("Você", messageText, "user");
-        userInput.value = "";
-
-        const loadingDiv = document.createElement("div");
-        loadingDiv.classList.add("message", "assistant-message");
-        loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
-        chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
+    for (const model of models) {
         try {
-            const response = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: messageText })
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: message }] }]
+                })
             });
 
             const data = await response.json();
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
 
-            if (data && data.response) {
-                appendMessage("Chronical", data.response, "ia");
-            } else {
-                appendMessage("Chronical", "Não foi possível obter resposta.", "ia");
-            }
-        } catch (error) {
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
-            appendMessage("Chronical", "Erro ao conectar ao servidor.", "ia");
-        }
-    }
-
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
-    if (userInput) {
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-    }
-});
-        logoutBtn.addEventListener("click", () => {
-            isGuestMode = false;
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().signOut();
-            }
-            authContainer.classList.remove("hidden");
-            chatContainer.classList.add("hidden");
-        });
-    }
-
-    // Mensagens do Chat
-    function appendMessage(sender, text, type) {
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("message");
-        msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
-        
-        if (type === "ia" && typeof marked !== "undefined") {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
-        } else {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-        }
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv;
-    }
-
-    async function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (!messageText) return;
-
-        appendMessage("Você", messageText, "user");
-        userInput.value = "";
-
-        const loadingDiv = document.createElement("div");
-        loadingDiv.classList.add("message", "assistant-message");
-        loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
-        chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: messageText })
-            });
-
-            const data = await response.json();
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
-
-            if (data && data.response) {
-                appendMessage("Chronical", data.response, "ia");
-            } else {
-                appendMessage("Chronical", "Não foi possível obter resposta.", "ia");
-            }
-        } catch (error) {
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
-            appendMessage("Chronical", "Erro ao conectar ao servidor.", "ia");
-        }
-    }
-
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
-    if (userInput) {
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-    }
-});
-        logoutBtn.addEventListener("click", () => {
-            isGuestMode = false;
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().signOut();
-            }
-            authContainer.classList.remove("hidden");
-            chatContainer.classList.add("hidden");
-        });
-    }
-
-    // Exibir Mensagens
-    function appendMessage(sender, text, type) {
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("message");
-        msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
-        
-        if (type === "ia" && typeof marked !== "undefined") {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
-        } else {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-        }
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv;
-    }
-
-    // Enviar mensagem com Streaming (Respostas em Tempo Real)
-    async function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (!messageText) return;
-
-        appendMessage("Você", messageText, "user");
-        userInput.value = "";
-
-        // Cria a bolha da mensagem da IA vazia
-        const aiMsgDiv = document.createElement("div");
-        aiMsgDiv.classList.add("message", "assistant-message");
-        aiMsgDiv.innerHTML = `<strong>Chronical:</strong> <div class="markdown-content">...</div>`;
-        chatBox.appendChild(aiMsgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        const contentDiv = aiMsgDiv.querySelector(".markdown-content");
-        let fullResponseText = "";
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: messageText })
-            });
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder("utf-8");
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                const chunk = decoder.decode(value, { stream: true });
-                const lines = chunk.split("\n");
-
-                for (const line of lines) {
-                    if (line.startsWith("data: ")) {
-                        const dataStr = line.replace("data: ", "").trim();
-                        if (dataStr === "[DONE]") break;
-
-                        try {
-                            const parsed = JSON.parse(dataStr);
-                            if (parsed.text) {
-                                fullResponseText += parsed.text;
-                                contentDiv.innerHTML = typeof marked !== "undefined" 
-                                    ? marked.parse(fullResponseText) 
-                                    : fullResponseText;
-                                chatBox.scrollTop = chatBox.scrollHeight;
-                            }
-                        } catch (e) {
-                            // Pula chunks incompletos
-                        }
-                    }
+            // Se o modelo estiver com alta procura (status 429/503), tenta o próximo modelo da lista
+            if (!response.ok) {
+                lastError = data.error?.message || `Erro no modelo ${model}`;
+                if (response.status === 429 || response.status === 503 || data.error?.code === 429) {
+                    continue; 
                 }
+                return res.status(500).json({ error: lastError });
             }
-        } catch (error) {
-            contentDiv.innerHTML = "Erro ao conectar ao servidor.";
+
+            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta do modelo.';
+            return res.status(200).json({ text: reply });
+
+        } catch (err) {
+            lastError = err.message;
         }
     }
 
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
-    if (userInput) {
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-    }
-});
-        logoutBtn.addEventListener("click", () => {
-            isGuestMode = false;
-            if (typeof firebase !== 'undefined' && firebase.auth) {
-                firebase.auth().signOut();
-            }
-            authContainer.classList.remove("hidden");
-            chatContainer.classList.add("hidden");
-        });
-    }
-
-    // Mensagens do Chat
-    function appendMessage(sender, text, type) {
-        const msgDiv = document.createElement("div");
-        msgDiv.classList.add("message");
-        msgDiv.classList.add(type === "user" ? "user-message" : "assistant-message");
-        
-        if (type === "ia" && typeof marked !== "undefined") {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
-        } else {
-            msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-        }
-
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-        return msgDiv;
-    }
-
-    async function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (!messageText) return;
-
-        appendMessage("Você", messageText, "user");
-        userInput.value = "";
-
-        const loadingDiv = document.createElement("div");
-        loadingDiv.classList.add("message", "assistant-message");
-        loadingDiv.innerHTML = "<strong>Chronical:</strong> Digitando...";
-        chatBox.appendChild(loadingDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        try {
-            const response = await fetch(BACKEND_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: messageText })
-            });
-
-            const data = await response.json();
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
-
-            if (data && data.response) {
-                appendMessage("Chronical", data.response, "ia");
-            } else {
-                appendMessage("Chronical", "Não foi possível obter resposta.", "ia");
-            }
-        } catch (error) {
-            if (chatBox.contains(loadingDiv)) chatBox.removeChild(loadingDiv);
-            appendMessage("Chronical", "Erro ao conectar ao servidor.", "ia");
-        }
-    }
-
-    if (sendBtn) sendBtn.addEventListener("click", sendMessage);
-    if (userInput) {
-        userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-    }
-});
+    return res.status(503).json({ 
+        error: 'Servidores da Google temporariamente ocupados. Por favor, tenta novamente em instantes.' 
+    });
+}
