@@ -12,7 +12,7 @@
 </head>
 <body>
 
-    <!-- TELA DE ABERTURA (SPLASH SCREEN COM ANIMAÇÃO NO CENTRO) -->
+    <!-- TELA DE ABERTURA (SPLASH SCREEN) -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
             <h1 class="splash-title">Bem-vindo à <span class="highlight">Chronical I.A</span></h1>
@@ -20,7 +20,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE LOGIN (Abre ao clicar no botão "Entrar") -->
+    <!-- MODAL DE LOGIN -->
     <div id="auth-modal" class="auth-modal hidden">
         <div class="auth-modal-overlay" id="close-modal-overlay"></div>
         <div class="auth-box">
@@ -47,10 +47,42 @@
         </div>
     </div>
 
-    <!-- TELA DO CHAT (Carregada no fundo e liberada após a animação) -->
+    <!-- MODAL DE CONFIGURAÇÕES -->
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="settings-modal-overlay" id="close-settings-overlay"></div>
+        <div class="settings-box">
+            <div class="settings-header">
+                <h2>Configurações</h2>
+                <button id="close-settings-btn" class="close-modal-x">&times;</button>
+            </div>
+            
+            <div class="settings-body">
+                <!-- Menu de Abas -->
+                <nav class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">Geral</button>
+                </nav>
+
+                <!-- Conteúdo da Aba Geral -->
+                <div class="tab-content active" id="tab-general">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">Leitura automática</span>
+                            <span class="setting-desc">Lê automaticamente as respostas da IA usando voz sintética</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-read-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container" role="main">
         
-        <!-- Cabeçalho: 3 Barrinhas (Esquerda) e Botão Entrar (Direita) -->
+        <!-- Cabeçalho -->
         <header class="top-bar">
             <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
                 <span></span>
@@ -78,13 +110,24 @@
                     <div id="history-list" class="history-list"></div>
                 </div>
 
-                <div class="user-info-card">
-                    <span class="user-label">Usuário</span>
-                    <span id="user-display-name">Visitante</span>
-                </div>
+                <div class="sidebar-bottom">
+                    <div class="user-info-card">
+                        <span class="user-label">Usuário</span>
+                        <span id="user-display-name">Visitante</span>
+                    </div>
 
-                <div class="logout-section">
-                    <button id="logout-btn" type="button">Sair da Conta</button>
+                    <!-- Botão Configurações -->
+                    <button id="settings-btn" class="sidebar-action-btn" type="button">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        <span>Configurações</span>
+                    </button>
+
+                    <div class="logout-section">
+                        <button id="logout-btn" type="button">Sair da Conta</button>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -97,7 +140,7 @@
             </div>
         </main>
 
-        <!-- Barra de Entrada de Texto / Áudio -->
+        <!-- Barra de Entrada -->
         <footer class="input-container">
             <div id="attachment-preview" class="attachment-preview hidden">
                 <span id="attachment-name"></span>
@@ -164,12 +207,36 @@
             const stopAudioBtn = document.getElementById("stop-audio-btn");
             const audioWaveContainer = document.getElementById("audio-wave-container");
 
-            /* TEMPO DA ANIMAÇÃO DE ENTRADA (2.2 segundos) */
+            /* Estado de Leitura Automática */
+            const autoReadToggle = document.getElementById("auto-read-toggle");
+            let autoReadEnabled = localStorage.getItem("chronical_auto_read") === "true";
+            if (autoReadToggle) {
+                autoReadToggle.checked = autoReadEnabled;
+                autoReadToggle.addEventListener("change", (e) => {
+                    autoReadEnabled = e.target.checked;
+                    localStorage.setItem("chronical_auto_read", autoReadEnabled);
+                    if (!autoReadEnabled && window.speechSynthesis) {
+                        window.speechSynthesis.cancel();
+                    }
+                });
+            }
+
+            function speakText(text) {
+                if (!autoReadEnabled || !('speechSynthesis' in window)) return;
+                window.speechSynthesis.cancel();
+                // Limpa marcações markdown simples para a voz
+                const cleanText = text.replace(/[*_#`~]/g, '');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'pt-BR';
+                window.speechSynthesis.speak(utterance);
+            }
+
+            /* Splash Screen */
             setTimeout(() => {
                 splashScreen.classList.add("fade-out");
                 setTimeout(() => {
                     splashScreen.style.display = "none";
-                    if (userInput) userInput.focus(); // Foca no campo para digitar
+                    if (userInput) userInput.focus();
                 }, 600);
             }, 2200);
 
@@ -182,6 +249,21 @@
             if (topLoginBtn) topLoginBtn.addEventListener("click", () => authModal.classList.remove("hidden"));
             if (closeModalBtn) closeModalBtn.addEventListener("click", () => authModal.classList.add("hidden"));
             if (closeModalOverlay) closeModalOverlay.addEventListener("click", () => authModal.classList.add("hidden"));
+
+            /* Modal de Configurações */
+            const settingsBtn = document.getElementById("settings-btn");
+            const settingsModal = document.getElementById("settings-modal");
+            const closeSettingsBtn = document.getElementById("close-settings-btn");
+            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
+
+            if (settingsBtn) {
+                settingsBtn.addEventListener("click", () => {
+                    toggleSidebar(false);
+                    settingsModal.classList.remove("hidden");
+                });
+            }
+            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", () => settingsModal.classList.add("hidden"));
+            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", () => settingsModal.classList.add("hidden"));
 
             /* Reconhecimento de Voz */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -314,8 +396,14 @@
                         contentSpan.innerHTML = `<span style="color:#f85149;">${data.error || "Erro no servidor."}</span>`;
                         return;
                     }
-                    contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
+
+                    const responseText = data.text || "";
+                    contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(responseText) : responseText;
                     chatBox.scrollTop = chatBox.scrollHeight;
+
+                    /* Executa leitura automática se estiver habilitada */
+                    speakText(responseText);
+
                 } catch (error) {
                     contentSpan.innerHTML = `<span style="color:#f85149;">Erro de conexão ao servidor.</span>`;
                 }
