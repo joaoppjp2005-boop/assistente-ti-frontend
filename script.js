@@ -13,14 +13,11 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'GEMINI_API_KEY não configurada na Vercel' });
     }
 
-    // Lista de modelos ordenada por preferência
+    // Lista de modelos suportados para fallback
     const models = [
-        'gemini-3.6-flash',
-        'gemini-1.5-flash-8b',
+        'gemini-1.5-flash',
         'gemini-1.5-pro'
     ];
-
-    let lastError = null;
 
     for (const model of models) {
         try {
@@ -34,24 +31,19 @@ export default async function handler(req, res) {
 
             const data = await response.json();
 
-            // Se o modelo estiver com alta procura (status 429/503), tenta o próximo modelo da lista
-            if (!response.ok) {
-                lastError = data.error?.message || `Erro no modelo ${model}`;
-                if (response.status === 429 || response.status === 503 || data.error?.code === 429) {
-                    continue; 
-                }
-                return res.status(500).json({ error: lastError });
+            // Se o modelo responder com sucesso, devolve a resposta imediatamente
+            if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+                const reply = data.candidates[0].content.parts[0].text;
+                return res.status(200).json({ text: reply });
             }
-
-            const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta do modelo.';
-            return res.status(200).json({ text: reply });
-
         } catch (err) {
-            lastError = err.message;
+            // Continua para o próximo modelo se ocorrer alguma falha de rede ou timeout
+            console.error(`Erro ao chamar modelo ${model}:`, err);
         }
     }
 
+    // Se nenhum modelo da lista conseguir responder
     return res.status(503).json({ 
-        error: 'Servidores da Google temporariamente ocupados. Por favor, tenta novamente em instantes.' 
+        error: 'O serviço do Gemini está temporariamente indisponível. Por favor, tenta novamente dentro de alguns segundos.' 
     });
 }
