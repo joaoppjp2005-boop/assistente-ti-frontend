@@ -1,77 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chronical - Assistente Virtual</title>
-    <link rel="stylesheet" href="style.css">
-    
-    <!-- Biblioteca para formatar texto Markdown -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
-    <!-- SDKs do Firebase Auth (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-</head>
-<body>
+const express = require('express');
+const cors = require('cors');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-    <!-- TELA DE LOGIN E CADASTRO -->
-    <div id="auth-container" class="auth-container">
-        <div class="auth-box">
-            <h2>Bem-vindo à Chronical</h2>
-            <p>Acesse com sua conta ou continue como visitante</p>
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-            <button id="google-login-btn" class="google-btn" type="button">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                Entrar com o Google
-            </button>
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-            <div class="divider">ou</div>
+// Rota de teste para o UptimeRobot / Ping
+app.get('/', (req, res) => {
+    res.send('Servidor Chronical está ativo!');
+});
 
-            <input type="email" id="auth-email" placeholder="Seu e-mail" autocomplete="email" />
-            <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
+// Rota do Chat com Streaming (SSE)
+app.post('/chat', async (req, res) => {
+    const { message } = req.body;
 
-            <div class="auth-buttons">
-                <button id="login-btn" type="button">Entrar</button>
-                <button id="register-btn" class="secondary-btn" type="button">Cadastrar</button>
-            </div>
+    if (!message) {
+        return res.status(400).json({ error: "A mensagem é obrigatória." });
+    }
 
-            <!-- Botão com clique direto integrado -->
-            <button id="guest-btn" class="guest-btn" type="button" onclick="entrarComoVisitante()">Continuar como Visitante</button>
-            
-            <p id="auth-error" class="error-msg"></p>
-        </div>
-    </div>
+    // Configura cabeçalhos HTTP para manter a conexão aberta em Server-Sent Events (SSE)
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-    <!-- TELA DO CHAT -->
-    <div id="chat-container" class="chat-container hidden" role="main">
-        <header>
-            <h1>Chronical</h1>
-            <div class="user-profile">
-                <span id="user-display-name"></span>
-                <button id="logout-btn" aria-label="Sair da conta" type="button">Sair</button>
-            </div>
-        </header>
+    try {
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        
+        // Solicita resposta em fluxo (stream)
+        const result = await model.generateContentStream(message);
 
-        <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
-            <div class="message assistant-message">
-                <strong>Chronical:</strong> Olá! Sou a Chronical. Como posso ajudar você hoje?
-            </div>
-        </main>
+        // Conforme cada pedaço da resposta chega da IA, envia imediatamente ao Frontend
+        for await (const chunk of result.stream) {
+            const chunkText = chunk.text();
+            res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+        }
 
-        <footer class="input-container" role="region" aria-label="Área de envio de mensagem">
-            <label for="user-input" class="sr-only">Digite sua mensagem para a Chronical</label>
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="Digite sua mensagem aqui..." 
-                aria-label="Mensagem para o assistente"
-                autocomplete="off"
-            />
-            <button id="send-btn" aria-label="Enviar mensagem" type="button">Enviar</button>
-        </footer>
-    </div>
+        // Finaliza o envio
+        res.write('data: [DONE]\n\n');
+        res.end();
+    } catch (error) {
+        console.error("Erro no Gemini:", error);
+        res.write(`data: ${JSON.stringify({ error: "Erro ao processar mensagem." })}\n\n`);
+        res.end();
+    }
+});
 
-    <script src="script.js"></script>
-</body>
-</html>
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
