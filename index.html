@@ -176,12 +176,11 @@
 
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
-                aiMsgDiv.innerHTML = `<strong>Chronical:</strong> <span class="markdown-content">...</span>`;
+                aiMsgDiv.innerHTML = `<strong>Chronical:</strong> <span class="markdown-content">Pensando...</span>`;
                 chatBox.appendChild(aiMsgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
                 const contentSpan = aiMsgDiv.querySelector(".markdown-content");
-                let fullResponseText = "";
 
                 try {
                     const response = await fetch(BACKEND_URL, {
@@ -190,41 +189,20 @@
                         body: JSON.stringify({ message: messageText })
                     });
 
+                    const data = await response.json();
+
                     if (!response.ok) {
-                        contentSpan.innerHTML = "Erro ao obter resposta do servidor.";
+                        contentSpan.innerHTML = data.error || "Erro ao obter resposta do servidor.";
                         return;
                     }
 
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-
-                    while (true) {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        const chunk = decoder.decode(value, { stream: true });
-                        const lines = chunk.split("\n");
-
-                        for (const line of lines) {
-                            if (line.startsWith("data: ")) {
-                                const dataStr = line.replace("data: ", "").trim();
-                                if (dataStr === "[DONE]") break;
-
-                                try {
-                                    const parsed = JSON.parse(dataStr);
-                                    if (parsed.text) {
-                                        fullResponseText += parsed.text;
-                                        contentSpan.innerHTML = typeof marked !== "undefined" 
-                                            ? marked.parse(fullResponseText) 
-                                            : fullResponseText;
-                                        chatBox.scrollTop = chatBox.scrollHeight;
-                                    }
-                                } catch (e) {
-                                    // Ignora partes incompletas do stream
-                                }
-                            }
-                        }
+                    if (data.text) {
+                        contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
+                    } else {
+                        contentSpan.innerHTML = "Resposta vazia da IA.";
                     }
+                    chatBox.scrollTop = chatBox.scrollHeight;
+
                 } catch (error) {
                     contentSpan.innerHTML = "Erro de conexão ao servidor.";
                 }
@@ -240,4 +218,3 @@
     </script>
 </body>
 </html>
-
