@@ -20,7 +20,7 @@
 
             <button id="google-login-btn" class="google-btn" type="button">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                Entrar com o Google
+                <span>Entrar com o Google</span>
             </button>
 
             <div class="divider">ou</div>
@@ -40,26 +40,32 @@
 
     <!-- TELA DO CHAT -->
     <div id="chat-container" class="chat-container hidden" role="main">
-        <header>
-            <!-- 3 Barrinhas no Lado Esquerdo -->
-            <button id="menu-btn" class="menu-toggle-btn" aria-label="Abrir menu" type="button">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <h1>Chronical</h1>
-            <div style="width: 28px;"></div> <!-- Espaçador para centralizar o título -->
-        </header>
+        <!-- Botão Flutuante de 3 Barrinhas -->
+        <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
         <div id="sidebar-overlay" class="sidebar-overlay"></div>
 
-        <!-- Sidebar deslizando da esquerda -->
+        <!-- Sidebar / Histórico de Conversas -->
         <aside id="sidebar-menu" class="sidebar-menu">
             <div class="sidebar-header">
-                <h3>Opções</h3>
+                <h3>Menu</h3>
                 <button id="close-menu-btn" class="close-menu-btn" type="button">&times;</button>
             </div>
+
             <div class="sidebar-content">
+                <button id="new-chat-btn" class="new-chat-btn" type="button">+ Novo Chat</button>
+
+                <div class="history-section">
+                    <span class="section-label">Histórico de Conversas</span>
+                    <div id="history-list" class="history-list">
+                        <!-- Itens do histórico inseridos via JS -->
+                    </div>
+                </div>
+
                 <div class="user-info-card">
                     <span class="user-label">Usuário</span>
                     <span id="user-display-name">Visitante</span>
@@ -97,27 +103,51 @@
                 <button id="remove-attachment-btn" type="button">&times;</button>
             </div>
 
-            <div class="input-wrapper">
-                <!-- Ícone de Anexo mudado para um mais (+) -->
-                <label for="file-input" class="attach-btn" title="Adicionar arquivo">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Estilo de Barra Estilo Gemini -->
+            <div class="gemini-input-wrapper">
+                <label for="file-input" class="gemini-action-btn" title="Adicionar arquivo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
                 </label>
                 <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
 
-                <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
+                <!-- Campo de Texto -->
+                <input type="text" id="user-input" placeholder="Pergunte algo..." autocomplete="off" />
 
-                <!-- Ícone do Microfone Exatamente igual ao modelo da imagem -->
-                <button id="mic-btn" type="button" class="icon-btn" title="Falar / Gravar">
-                    <svg width="20" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <!-- Visualizador/Indicador de Áudio (Onda Sonora) -->
+                <div id="audio-wave-container" class="audio-wave-container hidden">
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                    <span class="wave-bar"></span>
+                </div>
+
+                <!-- Botão Parar / Limpar Gravação -->
+                <button id="stop-audio-btn" type="button" class="gemini-action-btn hidden" title="Cancelar gravação">
+                    <div class="stop-icon"></div>
+                </button>
+
+                <!-- Botão do Microfone -->
+                <button id="mic-btn" type="button" class="gemini-action-btn" title="Falar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.53 16.39 17.44 13 17.93V20H17V22H7V20H11V17.93C7.61 17.44 5 14.53 5 11H7C7 13.76 9.24 16 12 16C14.76 16 17 13.76 17 11H19Z"/>
                     </svg>
                 </button>
                 
-                <button id="send-btn" class="send-btn-icon" aria-label="Enviar" type="button">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <!-- Botão de Enviar Azul -->
+                <button id="send-btn" class="gemini-send-btn" aria-label="Enviar" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="19" x2="12" y2="5"></line>
+                        <polyline points="5 12 12 5 19 12"></polyline>
+                    </svg>
                 </button>
             </div>
         </footer>
@@ -142,14 +172,74 @@
             const attachmentName = document.getElementById("attachment-name");
             const removeAttachmentBtn = document.getElementById("remove-attachment-btn");
             const micBtn = document.getElementById("mic-btn");
-            const audioModeSelect = document.getElementById("audio-mode-select");
+            const stopAudioBtn = document.getElementById("stop-audio-btn");
+            const audioWaveContainer = document.getElementById("audio-wave-container");
+            const historyList = document.getElementById("history-list");
+            const newChatBtn = document.getElementById("new-chat-btn");
 
             let currentFile = null;
-            let mediaRecorder = null;
-            let audioChunks = [];
-            let isRecordingAudio = false;
+            let currentChatId = Date.now().toString();
+            let chatsHistory = JSON.parse(localStorage.getItem("chronical_chats")) || {};
 
-            /* Gerenciamento de Anexo */
+            /* Gerenciar Histórico de Conversas */
+            function saveCurrentChat(firstUserMsg) {
+                if (!chatsHistory[currentChatId]) {
+                    chatsHistory[currentChatId] = {
+                        title: firstUserMsg.length > 25 ? firstUserMsg.substring(0, 25) + "..." : firstUserMsg,
+                        messages: []
+                    };
+                }
+                localStorage.setItem("chronical_chats", JSON.stringify(chatsHistory));
+                renderHistoryList();
+            }
+
+            function renderHistoryList() {
+                historyList.innerHTML = "";
+                const keys = Object.keys(chatsHistory).reverse();
+                
+                if (keys.length === 0) {
+                    historyList.innerHTML = `<span class="empty-history">Nenhuma conversa salva</span>`;
+                    return;
+                }
+
+                keys.forEach(id => {
+                    const item = document.createElement("div");
+                    item.classList.add("history-item");
+                    if (id === currentChatId) item.classList.add("active");
+                    item.textContent = chatsHistory[id].title || "Conversa";
+
+                    item.addEventListener("click", () => {
+                        currentChatId = id;
+                        loadChat(id);
+                        toggleSidebar(false);
+                    });
+
+                    historyList.appendChild(item);
+                });
+            }
+
+            function loadChat(id) {
+                chatBox.innerHTML = "";
+                const chat = chatsHistory[id];
+                if (chat && chat.messages) {
+                    chat.messages.forEach(m => {
+                        appendMessageUI(m.sender, m.text, m.type, m.fileName);
+                    });
+                } else {
+                    appendMessageUI("Chronical", "Olá! Sou a Chronical. Como posso ajudar você hoje?", "ia");
+                }
+                renderHistoryList();
+            }
+
+            newChatBtn.addEventListener("click", () => {
+                currentChatId = Date.now().toString();
+                chatBox.innerHTML = "";
+                appendMessageUI("Chronical", "Olá! Sou a Chronical. Como posso ajudar você hoje?", "ia");
+                renderHistoryList();
+                toggleSidebar(false);
+            });
+
+            /* Anexos */
             fileInput.addEventListener("change", (e) => {
                 const file = e.target.files[0];
                 if (file) {
@@ -165,7 +255,7 @@
                 attachmentPreview.classList.add("hidden");
             });
 
-            /* Lógica de Microfone: Alterna entre Reconhecimento de Texto e Gravação de Áudio */
+            /* Microfone e Interface de Áudio (Gemini Style) */
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             let recognition = null;
             let isListeningSpeech = false;
@@ -173,68 +263,54 @@
             if (SpeechRecognition) {
                 recognition = new SpeechRecognition();
                 recognition.lang = 'pt-BR';
-                recognition.continuous = false;
+                recognition.continuous = true;
+                recognition.interimResults = true;
 
                 recognition.onstart = () => {
                     isListeningSpeech = true;
-                    micBtn.classList.add("recording");
-                    userInput.placeholder = "Ouvindo...";
+                    userInput.classList.add("hidden");
+                    micBtn.classList.add("hidden");
+                    audioWaveContainer.classList.remove("hidden");
+                    stopAudioBtn.classList.remove("hidden");
                 };
 
                 recognition.onresult = (event) => {
-                    userInput.value = event.results[0][0].transcript;
+                    let transcript = "";
+                    for (let i = event.resultIndex; i < event.results.length; ++i) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    userInput.value = transcript;
                 };
 
                 recognition.onerror = recognition.onend = () => {
-                    isListeningSpeech = false;
-                    micBtn.classList.remove("recording");
-                    userInput.placeholder = "Pergunte algo à Chronical...";
+                    resetAudioUI();
                 };
             }
 
-            micBtn.addEventListener("click", async () => {
-                const mode = audioModeSelect.value;
+            function resetAudioUI() {
+                isListeningSpeech = false;
+                userInput.classList.remove("hidden");
+                micBtn.classList.remove("hidden");
+                audioWaveContainer.classList.add("hidden");
+                stopAudioBtn.classList.add("hidden");
+            }
 
-                if (mode === "text") {
-                    if (SpeechRecognition) {
-                        if (isListeningSpeech) recognition.stop();
-                        else recognition.start();
-                    } else {
-                        alert("Reconhecimento de voz em texto não é suportado neste navegador.");
-                    }
+            micBtn.addEventListener("click", () => {
+                if (SpeechRecognition) {
+                    if (!isListeningSpeech) recognition.start();
                 } else {
-                    // Modo Áudio Gravado
-                    if (!isRecordingAudio) {
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                            mediaRecorder = new MediaRecorder(stream);
-                            audioChunks = [];
-
-                            mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
-                            mediaRecorder.onstop = () => {
-                                const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
-                                const audioUrl = URL.createObjectURL(audioBlob);
-                                appendAudioMessage("Você", audioUrl, "user");
-                                stream.getTracks().forEach(track => track.stop());
-                            };
-
-                            mediaRecorder.start();
-                            isRecordingAudio = true;
-                            micBtn.classList.add("recording");
-                            userInput.placeholder = "Gravando áudio...";
-                        } catch (err) {
-                            alert("Permissão de microfone negada ou não suportada.");
-                        }
-                    } else {
-                        mediaRecorder.stop();
-                        isRecordingAudio = false;
-                        micBtn.classList.remove("recording");
-                        userInput.placeholder = "Pergunte algo à Chronical...";
-                    }
+                    alert("Reconhecimento de voz não suportado neste navegador.");
                 }
             });
 
-            /* Menu Lateral à Esquerda */
+            stopAudioBtn.addEventListener("click", () => {
+                if (recognition && isListeningSpeech) {
+                    recognition.stop();
+                }
+                resetAudioUI();
+            });
+
+            /* Menu Lateral */
             const menuBtn = document.getElementById("menu-btn");
             const closeMenuBtn = document.getElementById("close-menu-btn");
             const sidebarMenu = document.getElementById("sidebar-menu");
@@ -254,18 +330,7 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            function appendAudioMessage(sender, audioUrl, type) {
-                const msgDiv = document.createElement("div");
-                msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
-                msgDiv.innerHTML = `
-                    <div class="message-header">${sender}</div>
-                    <audio controls src="${audioUrl}" style="max-width: 100%; margin-top: 4px;"></audio>
-                `;
-                chatBox.appendChild(msgDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-
-            function appendMessage(sender, text, type, fileName = null) {
+            function appendMessageUI(sender, text, type, fileName = null) {
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
                 
@@ -283,14 +348,18 @@
             }
 
             async function sendMessage() {
+                if (recognition && isListeningSpeech) recognition.stop();
+                resetAudioUI();
+
                 const messageText = userInput.value.trim();
                 if (!messageText && !currentFile) return;
 
                 const fileAttachedName = currentFile ? currentFile.name : null;
 
-                appendMessage("Você", messageText || "(Arquivo enviado)", "user", fileAttachedName);
+                appendMessageUI("Você", messageText || "(Arquivo enviado)", "user", fileAttachedName);
+                saveCurrentChat(messageText || "Arquivo enviado");
+
                 userInput.value = "";
-                
                 currentFile = null;
                 fileInput.value = "";
                 attachmentPreview.classList.add("hidden");
@@ -323,6 +392,12 @@
 
                     if (data.text) {
                         contentSpan.innerHTML = typeof marked !== "undefined" ? marked.parse(data.text) : data.text;
+                        
+                        if (!chatsHistory[currentChatId]) chatsHistory[currentChatId] = { title: messageText.substring(0,25), messages: [] };
+                        chatsHistory[currentChatId].messages.push({ sender: "Você", text: messageText, type: "user" });
+                        chatsHistory[currentChatId].messages.push({ sender: "Chronical", text: data.text, type: "ia" });
+                        localStorage.setItem("chronical_chats", JSON.stringify(chatsHistory));
+
                     } else {
                         contentSpan.innerHTML = "Resposta vazia da IA.";
                     }
@@ -339,6 +414,8 @@
                     if (e.key === "Enter") sendMessage();
                 });
             }
+
+            renderHistoryList();
         });
     </script>
 </body>
