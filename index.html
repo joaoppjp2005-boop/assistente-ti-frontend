@@ -46,15 +46,19 @@
     <div id="chat-container" class="chat-container hidden" role="main">
         <header>
             <h1>Chronical</h1>
-            <div class="user-profile" style="display: flex; align-items: center; gap: 8px;">
-                <!-- BOTÃO DE VOZ VISÍVEL COM COR DE DESTAQUE -->
-                <button id="voice-toggle-btn" type="button" style="padding: 6px 12px; font-size: 14px; cursor: pointer; border-radius: 4px; border: none; background-color: #007bff; color: white;">
-                    🔈 Voz: OFF
-                </button>
+            <div class="user-profile">
                 <span id="user-display-name"></span>
                 <button id="logout-btn" aria-label="Sair da conta" type="button">Sair</button>
             </div>
         </header>
+
+        <!-- BARRA DE FERRAMENTAS COM O BOTÃO DE VOZ -->
+        <div style="background-color: #1e293b; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155;">
+            <span style="color: #94a3b8; font-size: 13px;">Leitura por voz:</span>
+            <button id="voice-toggle-btn" type="button" style="padding: 6px 14px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 6px; border: none; background-color: #475569; color: white; transition: 0.2s;">
+                🔈 Voz: OFF
+            </button>
+        </div>
 
         <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
             <div class="message assistant-message">
@@ -118,7 +122,7 @@
                 voiceToggleBtn.addEventListener("click", () => {
                     isVoiceEnabled = !isVoiceEnabled;
                     voiceToggleBtn.textContent = isVoiceEnabled ? "🔊 Voz: ON" : "🔈 Voz: OFF";
-                    voiceToggleBtn.style.backgroundColor = isVoiceEnabled ? "#28a745" : "#007bff";
+                    voiceToggleBtn.style.backgroundColor = isVoiceEnabled ? "#16a34a" : "#475569";
                     
                     if (!isVoiceEnabled && 'speechSynthesis' in window) {
                         window.speechSynthesis.cancel();
