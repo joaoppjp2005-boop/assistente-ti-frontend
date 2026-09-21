@@ -196,8 +196,6 @@
         }
         const auth = firebase.auth();
 
-        const BACKEND_URL = "/api/chat";
-
         document.addEventListener("DOMContentLoaded", () => {
             const splashScreen = document.getElementById("splash-screen");
             const userInput = document.getElementById("user-input");
@@ -215,10 +213,38 @@
             const userAvatar = document.getElementById("user-avatar");
             const authError = document.getElementById("auth-error");
 
-            /* Estado de Autenticação Dinâmico */
+            // Elementos de Configurações
+            const settingsBtn = document.getElementById("settings-btn");
+            const settingsModal = document.getElementById("settings-modal");
+            const closeSettingsBtn = document.getElementById("close-settings-btn");
+            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
+
+            /* --- LÓGICA DAS CONFIGURAÇÕES --- */
+            function openSettings() {
+                toggleSidebar(false); // Fecha o menu lateral ao abrir as configurações
+                if (settingsModal) settingsModal.classList.remove("hidden");
+            }
+
+            function closeSettings() {
+                if (settingsModal) settingsModal.classList.add("hidden");
+            }
+
+            if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
+            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
+            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", closeSettings);
+
+            // Troca de Abas dentro de Configurações
+            const tabBtns = document.querySelectorAll(".tab-btn");
+            tabBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    tabBtns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                });
+            });
+
+            /* --- ESTADO DE AUTENTICAÇÃO E PERFIL --- */
             auth.onAuthStateChanged((user) => {
                 if (user) {
-                    // Usuário Autenticado: Atualiza Perfil
                     const name = user.displayName || user.email.split('@')[0];
                     userProfileName.textContent = name;
                     userProfileEmail.textContent = user.email;
@@ -228,14 +254,13 @@
                     authActionText.textContent = "Sair";
                     if (topLoginBtn) topLoginBtn.style.display = "none";
                 } else {
-                    // Visitante: Oculta Perfil
                     userProfileCard.classList.add("hidden");
                     authActionText.textContent = "Fazer Login";
                     if (topLoginBtn) topLoginBtn.style.display = "block";
                 }
             });
 
-            // Ação do Botão Login/Sair do Menu e Superior
+            // Ação do Botão Login/Sair
             function handleAuthClick() {
                 if (auth.currentUser) {
                     auth.signOut();
@@ -291,11 +316,11 @@
                 }
             });
 
-            // Fechar Modais
+            // Fechar Modal de Auth
             document.getElementById("close-modal-btn").addEventListener("click", () => authModal.classList.add("hidden"));
             document.getElementById("close-modal-overlay").addEventListener("click", () => authModal.classList.add("hidden"));
 
-            /* Splash Screen */
+            /* --- SPLASH SCREEN --- */
             setTimeout(() => {
                 splashScreen.classList.add("fade-out");
                 setTimeout(() => {
@@ -304,7 +329,7 @@
                 }, 600);
             }, 2200);
 
-            /* Menu Lateral */
+            /* --- MENU LATERAL --- */
             const menuBtn = document.getElementById("menu-btn");
             const closeMenuBtn = document.getElementById("close-menu-btn");
             const sidebarMenu = document.getElementById("sidebar-menu");
@@ -324,7 +349,7 @@
             if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
             if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
 
-            /* Envio de Mensagem */
+            /* --- CHAT / MENSAGENS --- */
             async function sendMessage() {
                 const messageText = userInput.value.trim();
                 if (!messageText) return;
@@ -347,4 +372,377 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chronical - Assistente Virtual</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
 
+    <!-- TELA DE ABERTURA (SPLASH SCREEN) -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <h1 class="splash-title">Bem-vindo à <span class="highlight">Chronical I.A</span></h1>
+            <div class="splash-loader"></div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN / CADASTRO -->
+    <div id="auth-modal" class="auth-modal hidden">
+        <div class="auth-modal-overlay" id="close-modal-overlay"></div>
+        <div class="auth-box">
+            <button id="close-modal-btn" class="close-modal-x">&times;</button>
+            <h2>Chronical AI</h2>
+            <p>Acesse sua conta para salvar seu histórico e perfil</p>
+
+            <button id="google-login-btn" class="google-btn" type="button">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                <span>Entrar com o Google</span>
+            </button>
+
+            <div class="divider">ou</div>
+
+            <input type="text" id="auth-name" placeholder="Seu nome (para cadastro)" autocomplete="name" />
+            <input type="email" id="auth-email" placeholder="Seu e-mail" autocomplete="email" />
+            <input type="password" id="auth-password" placeholder="Sua senha" autocomplete="current-password" />
+
+            <div class="auth-buttons">
+                <button id="login-btn" class="btn-green" type="button">Entrar</button>
+                <button id="register-btn" class="secondary-btn" type="button">Cadastrar</button>
+            </div>
+
+            <p id="auth-error" class="error-msg"></p>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURAÇÕES -->
+    <div id="settings-modal" class="settings-modal hidden">
+        <div class="settings-modal-overlay" id="close-settings-overlay"></div>
+        <div class="settings-box">
+            <div class="settings-header">
+                <h2>Configurações</h2>
+                <button id="close-settings-btn" class="close-modal-x">&times;</button>
+            </div>
+            
+            <div class="settings-body">
+                <nav class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">Geral</button>
+                </nav>
+
+                <div class="tab-content active" id="tab-general">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <span class="setting-title">Leitura automática</span>
+                            <span class="setting-desc">Lê automaticamente as respostas da IA</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="auto-read-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA DO CHAT -->
+    <div id="chat-container" class="chat-container" role="main">
+        
+        <header class="top-bar">
+            <button id="menu-btn" class="floating-menu-btn" aria-label="Abrir menu" type="button">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <button id="top-login-btn" class="top-login-btn" type="button">Fazer Login</button>
+        </header>
+
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+        <!-- Sidebar / Menu Lateral -->
+        <aside id="sidebar-menu" class="sidebar-menu">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button id="close-menu-btn" class="close-menu-btn" type="button">&times;</button>
+            </div>
+
+            <div class="sidebar-content">
+                <button id="new-chat-btn" class="new-chat-btn" type="button">+ Novo Chat</button>
+
+                <div class="history-section">
+                    <span class="section-label">Mensagens Anteriores</span>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+
+                <!-- Rodapé do Menu -->
+                <div class="sidebar-bottom">
+                    
+                    <!-- Bloco Dinâmico de Perfil (Oculto se for visitante) -->
+                    <div id="user-profile-card" class="user-profile-card hidden">
+                        <div id="user-avatar" class="user-avatar">U</div>
+                        <div class="user-info">
+                            <span id="user-profile-name" class="user-profile-name">Nome do Usuário</span>
+                            <span id="user-profile-email" class="user-profile-email">email@exemplo.com</span>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação na mesma reta -->
+                    <div class="bottom-actions-row">
+                        <button id="settings-btn" class="sidebar-action-btn" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            <span>Configurações</span>
+                        </button>
+
+                        <button id="auth-action-btn" class="sidebar-action-btn login-btn-style" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                <polyline points="10 17 15 12 10 7"></polyline>
+                                <line x1="15" y1="12" x2="3" y2="12"></line>
+                            </svg>
+                            <span id="auth-action-text">Fazer Login</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Área de Mensagens -->
+        <main id="chat-box" class="chat-box">
+            <div class="message assistant-message">
+                <div class="message-header">CHRONICAL</div>
+                <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
+            </div>
+        </main>
+
+        <!-- Barra de Entrada -->
+        <footer class="input-container">
+            <div class="input-wrapper">
+                <label for="file-input" class="action-btn" title="Adicionar arquivo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </label>
+                <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
+
+                <input type="text" id="user-input" placeholder="Pergunte algo à Chronical..." autocomplete="off" />
+
+                <button id="mic-btn" type="button" class="action-btn" title="Falar">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C10.34 2 9 3.34 9 5V11C9 12.66 10.34 14 12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2ZM19 11C19 14.53 16.39 17.44 13 17.93V20H17V22H7V20H11V17.93C7.61 17.44 5 14.53 5 11H7C7 13.76 9.24 16 12 16C14.76 16 17 13.76 17 11H19Z"/>
+                    </svg>
+                </button>
+                
+                <button id="send-btn" class="send-btn-green" aria-label="Enviar" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // CONFIGURAÇÃO DO FIREBASE (Substitua pelos dados do seu projeto Firebase)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const splashScreen = document.getElementById("splash-screen");
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const sendBtn = document.getElementById("send-btn");
+
+            // Elementos de Autenticação / Perfil
+            const authModal = document.getElementById("auth-modal");
+            const topLoginBtn = document.getElementById("top-login-btn");
+            const authActionBtn = document.getElementById("auth-action-btn");
+            const authActionText = document.getElementById("auth-action-text");
+            const userProfileCard = document.getElementById("user-profile-card");
+            const userProfileName = document.getElementById("user-profile-name");
+            const userProfileEmail = document.getElementById("user-profile-email");
+            const userAvatar = document.getElementById("user-avatar");
+            const authError = document.getElementById("auth-error");
+
+            // Elementos de Configurações
+            const settingsBtn = document.getElementById("settings-btn");
+            const settingsModal = document.getElementById("settings-modal");
+            const closeSettingsBtn = document.getElementById("close-settings-btn");
+            const closeSettingsOverlay = document.getElementById("close-settings-overlay");
+
+            /* --- LÓGICA DAS CONFIGURAÇÕES --- */
+            function openSettings() {
+                toggleSidebar(false); // Fecha o menu lateral ao abrir as configurações
+                if (settingsModal) settingsModal.classList.remove("hidden");
+            }
+
+            function closeSettings() {
+                if (settingsModal) settingsModal.classList.add("hidden");
+            }
+
+            if (settingsBtn) settingsBtn.addEventListener("click", openSettings);
+            if (closeSettingsBtn) closeSettingsBtn.addEventListener("click", closeSettings);
+            if (closeSettingsOverlay) closeSettingsOverlay.addEventListener("click", closeSettings);
+
+            // Troca de Abas dentro de Configurações
+            const tabBtns = document.querySelectorAll(".tab-btn");
+            tabBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    tabBtns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                });
+            });
+
+            /* --- ESTADO DE AUTENTICAÇÃO E PERFIL --- */
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    const name = user.displayName || user.email.split('@')[0];
+                    userProfileName.textContent = name;
+                    userProfileEmail.textContent = user.email;
+                    userAvatar.textContent = name.charAt(0).toUpperCase();
+
+                    userProfileCard.classList.remove("hidden");
+                    authActionText.textContent = "Sair";
+                    if (topLoginBtn) topLoginBtn.style.display = "none";
+                } else {
+                    userProfileCard.classList.add("hidden");
+                    authActionText.textContent = "Fazer Login";
+                    if (topLoginBtn) topLoginBtn.style.display = "block";
+                }
+            });
+
+            // Ação do Botão Login/Sair
+            function handleAuthClick() {
+                if (auth.currentUser) {
+                    auth.signOut();
+                } else {
+                    toggleSidebar(false);
+                    authModal.classList.remove("hidden");
+                }
+            }
+
+            if (topLoginBtn) topLoginBtn.addEventListener("click", handleAuthClick);
+            if (authActionBtn) authActionBtn.addEventListener("click", handleAuthClick);
+
+            // Login com Email/Senha
+            document.getElementById("login-btn").addEventListener("click", async () => {
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao entrar: " + err.message;
+                }
+            });
+
+            // Cadastro de Usuário
+            document.getElementById("register-btn").addEventListener("click", async () => {
+                const name = document.getElementById("auth-name").value;
+                const email = document.getElementById("auth-email").value;
+                const password = document.getElementById("auth-password").value;
+                authError.textContent = "";
+
+                try {
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    if (name) {
+                        await userCredential.user.updateProfile({ displayName: name });
+                    }
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro ao cadastrar: " + err.message;
+                }
+            });
+
+            // Login com Google
+            document.getElementById("google-login-btn").addEventListener("click", async () => {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                try {
+                    await auth.signInWithPopup(provider);
+                    authModal.classList.add("hidden");
+                } catch (err) {
+                    authError.textContent = "Erro no Google Login: " + err.message;
+                }
+            });
+
+            // Fechar Modal de Auth
+            document.getElementById("close-modal-btn").addEventListener("click", () => authModal.classList.add("hidden"));
+            document.getElementById("close-modal-overlay").addEventListener("click", () => authModal.classList.add("hidden"));
+
+            /* --- SPLASH SCREEN --- */
+            setTimeout(() => {
+                splashScreen.classList.add("fade-out");
+                setTimeout(() => {
+                    splashScreen.style.display = "none";
+                    if (userInput) userInput.focus();
+                }, 600);
+            }, 2200);
+
+            /* --- MENU LATERAL --- */
+            const menuBtn = document.getElementById("menu-btn");
+            const closeMenuBtn = document.getElementById("close-menu-btn");
+            const sidebarMenu = document.getElementById("sidebar-menu");
+            const sidebarOverlay = document.getElementById("sidebar-overlay");
+
+            function toggleSidebar(open) {
+                if (open) {
+                    sidebarMenu.classList.add("open");
+                    sidebarOverlay.classList.add("visible");
+                } else {
+                    sidebarMenu.classList.remove("open");
+                    sidebarOverlay.classList.remove("visible");
+                }
+            }
+
+            if (menuBtn) menuBtn.addEventListener("click", () => toggleSidebar(true));
+            if (closeMenuBtn) closeMenuBtn.addEventListener("click", () => toggleSidebar(false));
+            if (sidebarOverlay) sidebarOverlay.addEventListener("click", () => toggleSidebar(false));
+
+            /* --- CHAT / MENSAGENS --- */
+            async function sendMessage() {
+                const messageText = userInput.value.trim();
+                if (!messageText) return;
+
+                const msgDiv = document.createElement("div");
+                msgDiv.classList.add("message", "user-message");
+                msgDiv.innerHTML = `<div class="message-header">Você</div>${messageText}`;
+                chatBox.appendChild(msgDiv);
+                userInput.value = "";
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+
+            if (sendBtn) sendBtn.addEventListener("click", sendMessage);
+            if (userInput) {
+                userInput.addEventListener("keypress", (e) => {
+                    if (e.key === "Enter") sendMessage();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
