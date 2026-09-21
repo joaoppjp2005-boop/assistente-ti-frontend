@@ -90,7 +90,19 @@
         </main>
 
         <footer class="input-container" role="region" aria-label="Área de envio de mensagem">
+            <!-- PRÉ-VISUALIZAÇÃO DE FICHEIRO ANEXADO -->
+            <div id="attachment-preview" class="attachment-preview hidden">
+                <span id="attachment-name"></span>
+                <button id="remove-attachment-btn" type="button">&times;</button>
+            </div>
+
             <div class="input-wrapper">
+                <!-- BOTÃO PARA ANEXAR FICHEIRO/FOTO -->
+                <label for="file-input" class="attach-btn" title="Anexar arquivo ou foto">
+                    📎
+                </label>
+                <input type="file" id="file-input" class="hidden" accept="image/*,.pdf,.doc,.docx,.txt" />
+
                 <label for="user-input" class="sr-only">Digite sua mensagem para a Chronical</label>
                 <input 
                     type="text" 
@@ -99,6 +111,13 @@
                     aria-label="Mensagem para o assistente"
                     autocomplete="off"
                 />
+
+                <!-- BOTÃO DE MICROFONE (FALAR) -->
+                <button id="mic-btn" type="button" class="icon-btn" title="Falar por voz">
+                    🎤
+                </button>
+
+                <!-- BOTÃO DE ENVIAR -->
                 <button id="send-btn" aria-label="Enviar mensagem" type="button">Enviar</button>
             </div>
         </footer>
@@ -140,6 +159,75 @@
             const userInput = document.getElementById("user-input");
             const sendBtn = document.getElementById("send-btn");
             const voiceToggleBtn = document.getElementById("voice-toggle-btn");
+
+            // Elementos de Anexo e Microfone
+            const fileInput = document.getElementById("file-input");
+            const attachmentPreview = document.getElementById("attachment-preview");
+            const attachmentName = document.getElementById("attachment-name");
+            const removeAttachmentBtn = document.getElementById("remove-attachment-btn");
+            const micBtn = document.getElementById("mic-btn");
+
+            let currentFile = null;
+
+            // LÓGICA DE ANEXAR FICHEIRO
+            fileInput.addEventListener("change", (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    currentFile = file;
+                    attachmentName.textContent = `📎 ${file.name}`;
+                    attachmentPreview.classList.remove("hidden");
+                }
+            });
+
+            removeAttachmentBtn.addEventListener("click", () => {
+                currentFile = null;
+                fileInput.value = "";
+                attachmentPreview.classList.add("hidden");
+            });
+
+            // LÓGICA DO MICROFONE (SpeechRecognition)
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition = null;
+            let isListening = false;
+
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'pt-BR';
+                recognition.continuous = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    micBtn.classList.add("recording");
+                    userInput.placeholder = "Ouvindo...";
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                };
+
+                recognition.onerror = () => {
+                    isListening = false;
+                    micBtn.classList.remove("recording");
+                    userInput.placeholder = "Digite sua mensagem...";
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    micBtn.classList.remove("recording");
+                    userInput.placeholder = "Digite sua mensagem...";
+                };
+
+                micBtn.addEventListener("click", () => {
+                    if (isListening) {
+                        recognition.stop();
+                    } else {
+                        recognition.start();
+                    }
+                });
+            } else {
+                micBtn.style.display = "none"; // Oculta caso o browser não suporte
+            }
 
             // Elementos do Menu Lateral
             const menuBtn = document.getElementById("menu-btn");
@@ -236,13 +324,16 @@
                 });
             }
 
-            function appendMessage(sender, text, type) {
+            function appendMessage(sender, text, type, fileName = null) {
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
+                
+                let fileTag = fileName ? `<div class="file-tag">📄 ${fileName}</div>` : '';
+
                 if (type === "ia" && typeof marked !== "undefined") {
-                    msgDiv.innerHTML = `<strong>${sender}</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
+                    msgDiv.innerHTML = `<strong>${sender}</strong> ${fileTag}<div class="markdown-content">${marked.parse(text)}</div>`;
                 } else {
-                    msgDiv.innerHTML = `<strong>${sender}</strong> ${text}`;
+                    msgDiv.innerHTML = `<strong>${sender}</strong> ${fileTag}${text}`;
                 }
                 chatBox.appendChild(msgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -251,10 +342,17 @@
 
             async function sendMessage() {
                 const messageText = userInput.value.trim();
-                if (!messageText) return;
+                if (!messageText && !currentFile) return;
 
-                appendMessage("Você", messageText, "user");
+                const fileAttachedName = currentFile ? currentFile.name : null;
+
+                appendMessage("Você", messageText || "(Arquivo enviado)", "user", fileAttachedName);
                 userInput.value = "";
+                
+                // Limpa anexo selecionado
+                currentFile = null;
+                fileInput.value = "";
+                attachmentPreview.classList.add("hidden");
 
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
