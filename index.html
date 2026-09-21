@@ -12,18 +12,23 @@
     <h2>Chronical AI</h2>
     <p>Acesse sua conta para salvar seu histórico e perfil</p>
 
-    <!-- Botão com id="btn-google" conectado ao script -->
     <button type="button" id="btn-google" class="btn-google">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo" width="18">
-      Entrar com o Google
+      <span>Entrar com o Google</span>
     </button>
 
     <div class="divider">ou</div>
 
     <form id="form-login">
-      <input type="text" placeholder="Seu nome (para cadastro)" id="input-nome">
-      <input type="email" placeholder="Seu e-mail" id="input-email" required>
-      <input type="password" placeholder="Sua senha" id="input-senha" required>
+      <div class="input-group">
+        <input type="text" placeholder="Seu nome (para cadastro)" id="input-nome">
+      </div>
+      <div class="input-group">
+        <input type="email" placeholder="Seu e-mail" id="input-email" required>
+      </div>
+      <div class="input-group">
+        <input type="password" placeholder="Sua senha" id="input-senha" required>
+      </div>
 
       <div class="button-group">
         <button type="submit" id="btn-entrar" class="btn-primary">Entrar</button>
@@ -34,7 +39,6 @@
     <div id="mensagem-erro" class="error-message"></div>
   </div>
 
-  <!-- IMPORTANTE: type="module" é obrigatório para usar o Firebase v10 -->
   <script type="module" src="script.js"></script>
 
 </body>
