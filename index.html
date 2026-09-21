@@ -18,7 +18,7 @@
     <!-- TELA DE LOGIN E CADASTRO -->
     <div id="auth-container" class="auth-container">
         <div class="auth-box">
-            <h2>Bem-vindo à Chronical</h2>
+            <h2>Chronical AI</h2>
             <p>Acesse com sua conta ou continue como visitante</p>
 
             <button id="google-login-btn" class="google-btn" type="button">
@@ -53,29 +53,32 @@
         </header>
 
         <!-- BARRA DE FERRAMENTAS COM O BOTÃO DE VOZ -->
-        <div style="background-color: #1e293b; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155;">
-            <span style="color: #94a3b8; font-size: 13px;">Leitura por voz:</span>
-            <button id="voice-toggle-btn" type="button" style="padding: 6px 14px; font-size: 13px; font-weight: bold; cursor: pointer; border-radius: 6px; border: none; background-color: #475569; color: white; transition: 0.2s;">
+        <div class="voice-toolbar">
+            <span>Leitura por voz:</span>
+            <button id="voice-toggle-btn" type="button">
                 🔈 Voz: OFF
             </button>
         </div>
 
         <main id="chat-box" class="chat-box" role="log" aria-live="polite" aria-label="Histórico de mensagens">
             <div class="message assistant-message">
-                <strong>Chronical:</strong> Olá! Sou a Chronical. Como posso ajudar você hoje?
+                <strong>Chronical</strong>
+                <div class="markdown-content">Olá! Sou a Chronical. Como posso ajudar você hoje?</div>
             </div>
         </main>
 
         <footer class="input-container" role="region" aria-label="Área de envio de mensagem">
-            <label for="user-input" class="sr-only">Digite sua mensagem para a Chronical</label>
-            <input 
-                type="text" 
-                id="user-input" 
-                placeholder="Digite sua mensagem aqui..." 
-                aria-label="Mensagem para o assistente"
-                autocomplete="off"
-            />
-            <button id="send-btn" aria-label="Enviar mensagem" type="button">Enviar</button>
+            <div class="input-wrapper">
+                <label for="user-input" class="sr-only">Digite sua mensagem para a Chronical</label>
+                <input 
+                    type="text" 
+                    id="user-input" 
+                    placeholder="Digite sua mensagem..." 
+                    aria-label="Mensagem para o assistente"
+                    autocomplete="off"
+                />
+                <button id="send-btn" aria-label="Enviar mensagem" type="button">Enviar</button>
+            </div>
         </footer>
     </div>
 
@@ -122,7 +125,7 @@
                 voiceToggleBtn.addEventListener("click", () => {
                     isVoiceEnabled = !isVoiceEnabled;
                     voiceToggleBtn.textContent = isVoiceEnabled ? "🔊 Voz: ON" : "🔈 Voz: OFF";
-                    voiceToggleBtn.style.backgroundColor = isVoiceEnabled ? "#16a34a" : "#475569";
+                    voiceToggleBtn.style.backgroundColor = isVoiceEnabled ? "#16a34a" : "#374151";
                     
                     if (!isVoiceEnabled && 'speechSynthesis' in window) {
                         window.speechSynthesis.cancel();
@@ -195,9 +198,9 @@
                 const msgDiv = document.createElement("div");
                 msgDiv.classList.add("message", type === "user" ? "user-message" : "assistant-message");
                 if (type === "ia" && typeof marked !== "undefined") {
-                    msgDiv.innerHTML = `<strong>${sender}:</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
+                    msgDiv.innerHTML = `<strong>${sender}</strong> <div class="markdown-content">${marked.parse(text)}</div>`;
                 } else {
-                    msgDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
+                    msgDiv.innerHTML = `<strong>${sender}</strong> ${text}`;
                 }
                 chatBox.appendChild(msgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
@@ -213,7 +216,7 @@
 
                 const aiMsgDiv = document.createElement("div");
                 aiMsgDiv.classList.add("message", "assistant-message");
-                aiMsgDiv.innerHTML = `<strong>Chronical:</strong> <span class="markdown-content">Pensando...</span>`;
+                aiMsgDiv.innerHTML = `<strong>Chronical</strong> <div class="markdown-content">Pensando...</div>`;
                 chatBox.appendChild(aiMsgDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
