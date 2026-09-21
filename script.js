@@ -4,7 +4,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstati
 
 // 2. Configuração do Firebase para o projeto Chronical
 const firebaseConfig = {
-  apiKey: "AQ.Ab8RN6K55S-JOxhZi94sQ3Mr8ozVd9evi9XeUpszs1fVmRzljQ",
+  apiKey: "AIzaSyAq1MaAD_jph9cVDDuYbCq1QxwKqLv64RE",
   authDomain: "chronical-624a2.firebaseapp.com",
   projectId: "chronical-624a2",
   storageBucket: "chronical-624a2.firebasestorage.app",
