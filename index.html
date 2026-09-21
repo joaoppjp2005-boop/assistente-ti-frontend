@@ -3,31 +3,187 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chronical I.A - Reinicialização</title>
+  <title>Chronical I.A</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
       background-color: #0b0f19;
-      color: #22c55e;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      color: #e2e8f0;
       height: 100vh;
-      font-family: Arial, sans-serif;
-      margin: 0;
+      display: flex;
+      overflow: hidden;
     }
-    .box {
-      text-align: center;
+
+    /* Menu Lateral / Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #111827;
+      border-right: 1px solid #1f2937;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+
+    .sidebar-header {
+      color: #22c55e;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    /* Área Principal do Chat */
+    .chat-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #0b0f19;
+    }
+
+    .messages-container {
+      flex: 1;
+      padding: 2rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      max-width: 75%;
+      line-height: 1.4;
+    }
+
+    .message.ai {
       background: #161e2e;
-      padding: 3rem;
-      border-radius: 12px;
-      border: 1px solid #22c55e;
+      color: #e2e8f0;
+      align-self: flex-start;
+      border: 1px solid #1f2937;
+    }
+
+    .message.user {
+      background: #22c55e;
+      color: #000;
+      align-self: flex-end;
+      font-weight: 500;
+    }
+
+    /* Barra de Input */
+    .input-bar {
+      padding: 1.2rem 2rem;
+      background: #111827;
+      border-top: 1px solid #1f2937;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .input-bar input {
+      flex: 1;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #fff;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .input-bar input:focus {
+      border-color: #22c55e;
+    }
+
+    .btn-green {
+      background-color: #22c55e;
+      color: #000;
+      font-weight: 600;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-green:hover {
+      background-color: #16a34a;
     }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h1>Chronical I.A a atualizar...</h1>
-    <p>A limpar cache e a sincronizar o sistema.</p>
-  </div>
+
+  <!-- Menu Lateral -->
+  <aside class="sidebar">
+    <div class="sidebar-header">Chronical I.A</div>
+    <div class="history-list">
+      <p style="margin-bottom: 0.5rem; font-weight: 600; color: #cbd5e1;">Conversa Atual</p>
+      <p style="font-size: 0.85rem; color: #64748b;">Nenhum histórico gravado</p>
+    </div>
+  </aside>
+
+  <!-- Painel do Chat -->
+  <main class="chat-area">
+    <div class="messages-container" id="messages">
+      <div class="message ai">
+        Olá! Sou a Chronical I.A. Sistema limpo e pronto a funcionar sem Firebase. Como posso ajudar você hoje?
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <input type="text" placeholder="Digite sua mensagem..." id="chat-input">
+      <button class="btn-green" id="send-btn">Enviar</button>
+    </div>
+  </main>
+
+  <script>
+    // Lógica simples e direta do chat integrada
+    const chatInput = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messagesContainer = document.getElementById('messages');
+
+    function enviarMensagem() {
+      const texto = chatInput.value.trim();
+      if (!texto) return;
+
+      // Adiciona mensagem do utilizador
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.textContent = texto;
+      messagesContainer.appendChild(userMsg);
+
+      chatInput.value = '';
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+      // Simulação de resposta da IA
+      setTimeout(() => {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'message ai';
+        aiMsg.textContent = "Compreendido! Estou a processar a sua mensagem de forma autónoma.";
+        messagesContainer.appendChild(aiMsg);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }, 800);
+    }
+
+    sendBtn.addEventListener('click', enviarMensagem);
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        enviarMensagem();
+      }
+    });
+  </script>
+
 </body>
 </html>
