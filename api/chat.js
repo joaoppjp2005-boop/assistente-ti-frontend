@@ -10,28 +10,22 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Mensagem ausente' });
     }
 
-    // Configura os cabeçalhos HTTP para streaming de texto (SSE)
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
     try {
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
-        // Gera a resposta em fluxo (stream)
-        const result = await model.generateContentStream(message);
-
-        for await (const chunk of result.stream) {
-            const chunkText = chunk.text();
-            res.write(`data: ${JSON.stringify({ text: chunkText })}\n\n`);
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.status(500).json({ error: 'GEMINI_API_KEY não configurada na Vercel' });
         }
 
-        res.write('data: [DONE]\n\n');
-        res.end();
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
+        const result = await model.generateContent(message);
+        const response = await result.response;
+        const text = response.text();
+
+        return res.status(200).json({ text: text });
     } catch (error) {
-        console.error(error);
-        res.write(`data: ${JSON.stringify({ error: 'Erro ao processar mensagem na Vercel' })}\n\n`);
-        res.end();
+        console.error('Erro no backend:', error);
+        return res.status(500).json({ error: 'Erro ao processar mensagem com a API do Gemini' });
     }
 }
