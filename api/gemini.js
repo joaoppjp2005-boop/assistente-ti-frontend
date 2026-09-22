@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Mensagem em falta' });
     }
 
-    const API_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6KDnKsAK9ezPtZH_ZTIlViu6HTerx-WR72GHhjTiKN7rQ";
+    const API_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6KlWxtq7DrgahTKlkAPew_mmz7cF0Ngtq5DcFHKUy6Oig";
 
     try {
         const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
