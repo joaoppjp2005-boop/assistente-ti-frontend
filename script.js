@@ -3,13 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const sendBtn = document.getElementById("send-btn");
     const messagesContainer = document.getElementById("messages");
 
-    const API_KEY = "AQ.Ab8RN6KDnKsAK9ezPtZH_ZTIlViu6HTerx-WR72GHhjTiKN7rQ";
-
     async function enviarMensagem() {
         const texto = chatInput.value.trim();
         if (!texto) return;
 
-        // 1. Mostra a mensagem do utilizador
         const userMsg = document.createElement("div");
         userMsg.className = "message user";
         userMsg.textContent = texto;
@@ -18,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
         chatInput.value = "";
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-        // 2. Balão de "A pensar..."
         const aiMsg = document.createElement("div");
         aiMsg.className = "message ai";
         aiMsg.textContent = "A contactar o Gemini...";
@@ -26,36 +22,25 @@ document.addEventListener("DOMContentLoaded", () => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
         try {
-            const resposta = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent', {
-                method: "POST",
+            const resposta = await fetch('/api/gemini', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${API_KEY}`
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                { text: texto }
-                            ]
-                        }
-                    ]
-                })
+                body: JSON.stringify({ message: texto })
             });
 
             const dados = await resposta.json();
 
-            if (dados.candidates && dados.candidates[0].content.parts[0].text) {
-                aiMsg.textContent = dados.candidates[0].content.parts[0].text;
-            } else if (dados.error) {
-                aiMsg.textContent = "Erro da API: " + dados.error.message;
-            } else {
-                aiMsg.textContent = "Resposta vazia recebida da IA.";
+            if (!resposta.ok) {
+                throw new Error(dados.error || 'Erro desconhecido');
             }
+
+            aiMsg.textContent = dados.reply;
 
         } catch (erro) {
             console.error("Erro na requisição:", erro);
-            aiMsg.textContent = "Erro de conexão ao tentar falar com a IA.";
+            aiMsg.textContent = "Erro: " + erro.message;
         }
 
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
